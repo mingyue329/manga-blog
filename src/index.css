@@ -1,0 +1,239 @@
+@import url('https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --radius-sm: 0rem;
+  --radius-md: 0rem;
+  --radius-lg: 0rem;
+  --radius-xl: 0rem;
+
+  --background: oklch(0.985 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.145 0 0);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.93 0 0);
+  --secondary-foreground: oklch(0.145 0 0);
+  --muted: oklch(0.95 0 0);
+  --muted-foreground: oklch(0.45 0 0);
+  --accent: oklch(0.95 0 0);
+  --accent-foreground: oklch(0.145 0 0);
+  --destructive: oklch(0.58 0.24 29.23);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.18 0 0);
+  --input: oklch(0.92 0 0);
+  --ring: oklch(0.18 0 0);
+
+  --paper: #f8f7f4;
+  --ink: #111111;
+  --ink-soft: #5c5c5c;
+  --panel-shadow: 10px 10px 0 0 #111111;
+  --panel-shadow-reverse: -10px 10px 0 0 #111111;
+  --halftone-dot: rgba(17, 17, 17, 0.18);
+  --site-max-width: 1280px;
+}
+
+@theme inline {
+  --font-sans: 'Plus Jakarta Sans', sans-serif;
+  --font-heading: 'Epilogue', sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background font-sans text-foreground antialiased;
+    min-height: 100vh;
+    margin: 0;
+    background-color: var(--paper);
+  }
+
+  a {
+    @apply text-inherit no-underline;
+  }
+
+  button {
+    @apply cursor-pointer;
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+}
+
+@layer utilities {
+  .font-heading {
+    font-family: var(--font-heading);
+  }
+
+  .manga-panel {
+    box-shadow: var(--panel-shadow);
+  }
+
+  .manga-panel-reverse {
+    box-shadow: var(--panel-shadow-reverse);
+  }
+
+  .ink-border-heavy {
+    border: 4px solid var(--ink);
+  }
+
+  .ink-border-medium {
+    border: 3px solid var(--ink);
+  }
+
+  .ink-border-thin {
+    border: 2px solid var(--ink);
+  }
+
+  .manga-halftone {
+    background-image: radial-gradient(circle, currentColor 1px, transparent 1px);
+    background-size: 6px 6px;
+  }
+
+  .manga-speed-lines {
+    background: repeating-conic-gradient(
+      from 0deg,
+      rgba(17, 17, 17, 0.14) 0deg 0.9deg,
+      transparent 0.9deg 10deg
+    );
+  }
+
+  .paper-noise {
+    background-image: radial-gradient(var(--halftone-dot) 0.8px, transparent 0.8px);
+    background-size: 10px 10px;
+  }
+
+  .manga-section-title {
+    @apply font-heading text-3xl font-black tracking-tight md:text-5xl;
+  }
+
+  .manga-label {
+    @apply font-heading text-xs font-black uppercase tracking-[0.28em];
+  }
+
+  .site-shell {
+    width: min(100% - 2rem, var(--site-max-width));
+    margin-inline: auto;
+  }
+
+  .speech-bubble-tail {
+    clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+  }
+
+  .interactive-dot-background {
+    --spotlight-x: 50vw;
+    --spotlight-y: 30vh;
+    --spotlight-opacity: 0;
+    --dot-grid-size: 28px;
+    --base-dot-color: rgba(17, 17, 17, 0.14);
+    --focus-dot-color: rgba(17, 17, 17, 0.72);
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .interactive-dot-background__base,
+  .interactive-dot-background__focus-glow,
+  .interactive-dot-background__focus-dots {
+    position: absolute;
+    inset: 0;
+  }
+
+  .interactive-dot-background__base {
+    background-image: radial-gradient(
+      circle,
+      var(--base-dot-color) 0 1.1px,
+      transparent 1.4px
+    );
+    background-size: var(--dot-grid-size) var(--dot-grid-size);
+    opacity: 0.95;
+  }
+
+  .interactive-dot-background__focus-glow {
+    background:
+      radial-gradient(
+        280px circle at var(--spotlight-x) var(--spotlight-y),
+        rgba(255, 255, 255, 0.95) 0%,
+        rgba(255, 255, 255, 0.82) 26%,
+        rgba(255, 255, 255, 0.32) 48%,
+        rgba(255, 255, 255, 0) 78%
+      );
+    opacity: calc(var(--spotlight-opacity) * 0.95);
+    transition: opacity 180ms ease-out;
+  }
+
+  .interactive-dot-background__focus-dots {
+    background-image: radial-gradient(
+      circle,
+      var(--focus-dot-color) 0 1.35px,
+      transparent 1.65px
+    );
+    background-size: var(--dot-grid-size) var(--dot-grid-size);
+    opacity: calc(var(--spotlight-opacity) * 1);
+    transition: opacity 180ms ease-out;
+    -webkit-mask-image: radial-gradient(
+      260px circle at var(--spotlight-x) var(--spotlight-y),
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 0.96) 34%,
+      rgba(0, 0, 0, 0.28) 60%,
+      transparent 78%
+    );
+    mask-image: radial-gradient(
+      260px circle at var(--spotlight-x) var(--spotlight-y),
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 0.96) 34%,
+      rgba(0, 0, 0, 0.28) 60%,
+      transparent 78%
+    );
+  }
+
+  @media (pointer: coarse), (prefers-reduced-motion: reduce) {
+    .interactive-dot-background__focus-glow,
+    .interactive-dot-background__focus-dots {
+      display: none;
+    }
+  }
+}

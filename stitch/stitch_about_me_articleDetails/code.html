@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;700;900&amp;family=Plus+Jakarta+Sans:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .manga-halftone {
+            background-image: radial-gradient(circle, #000 1px, transparent 1px);
+            background-size: 4px 4px;
+            opacity: 0.15;
+        }
+        .manga-halftone-heavy {
+            background-image: radial-gradient(circle, #000 1.5px, transparent 1.5px);
+            background-size: 6px 6px;
+            opacity: 0.3;
+        }
+        .speech-bubble-tail {
+            clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+        }
+        .sketch-border {
+            border: 3px solid #000;
+            box-shadow: 6px 6px 0px 0px #000;
+        }
+        .star-shape {
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+        }
+        body {
+            cursor: url('https://fonts.gstatic.com/s/i/materialiconsoutlined/edit/v11/24px.svg'), auto;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "tertiary-fixed": "#5e5e5e",
+                        "inverse-on-surface": "#f0f1f1",
+                        "on-secondary-fixed-variant": "#3b3b3b",
+                        "primary": "#000000",
+                        "on-primary": "#e2e2e2",
+                        "primary-container": "#3b3b3b",
+                        "outline-variant": "#c6c6c6",
+                        "on-primary-fixed": "#ffffff",
+                        "surface": "#f9f9f9",
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "surface-container-high": "#e8e8e8",
+                        "on-tertiary-fixed-variant": "#e2e2e2",
+                        "surface-container-highest": "#e2e2e2",
+                        "on-primary-fixed-variant": "#e2e2e2",
+                        "outline": "#777777",
+                        "inverse-primary": "#c6c6c6",
+                        "on-tertiary-fixed": "#ffffff",
+                        "surface-container": "#eeeeee",
+                        "surface-dim": "#dadada",
+                        "on-secondary-fixed": "#1b1b1b",
+                        "surface-bright": "#f9f9f9",
+                        "secondary-container": "#d4d4d4",
+                        "on-background": "#1a1c1c",
+                        "tertiary-container": "#747474",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-variant": "#e2e2e2",
+                        "primary-fixed": "#5e5e5e",
+                        "tertiary": "#3b3b3b",
+                        "on-tertiary-container": "#ffffff",
+                        "inverse-surface": "#2f3131",
+                        "primary-fixed-dim": "#474747",
+                        "on-error": "#ffffff",
+                        "on-error-container": "#410002",
+                        "on-secondary-container": "#1b1b1b",
+                        "on-surface-variant": "#474747",
+                        "on-secondary": "#ffffff",
+                        "surface-container-low": "#f3f3f4",
+                        "secondary-fixed-dim": "#ababab",
+                        "secondary-fixed": "#c6c6c6",
+                        "on-primary-container": "#ffffff",
+                        "tertiary-fixed-dim": "#474747",
+                        "surface-tint": "#5e5e5e",
+                        "on-tertiary": "#e2e2e2",
+                        "secondary": "#5e5e5e",
+                        "on-surface": "#1a1c1c",
+                        "background": "#f9f9f9"
+                    },
+                    fontFamily: {
+                        "headline": ["Epilogue"],
+                        "body": ["Plus Jakarta Sans"],
+                        "label": ["Plus Jakarta Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-surface font-body text-primary selection:bg-primary selection:text-white">
+<!-- TopNavBar -->
+<nav class="w-full top-0 z-50 border-b-4 border-black dark:border-white bg-white dark:bg-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+<div class="flex justify-between items-center w-full px-6 py-4 max-w-[1440px] mx-auto">
+<div class="text-4xl font-black italic tracking-tighter text-black dark:text-white hover:skew-x-[-10deg] transition-transform cursor-pointer">
+                MANGA_TECH
+            </div>
+<div class="hidden md:flex gap-8 items-center">
+<a class="font-['Epilogue'] uppercase tracking-tighter font-black text-white dark:text-black bg-black dark:bg-white px-2 py-1 underline decoration-wavy" href="#">LATEST</a>
+<a class="font-['Epilogue'] uppercase tracking-tighter font-black text-black dark:text-white hover:underline hover:decoration-wavy" href="#">ARCHIVE</a>
+<a class="font-['Epilogue'] uppercase tracking-tighter font-black text-black dark:text-white hover:underline hover:decoration-wavy" href="#">Screentones</a>
+<a class="font-['Epilogue'] uppercase tracking-tighter font-black text-black dark:text-white hover:underline hover:decoration-wavy" href="#">ABOUT</a>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden sm:block border-2 border-black px-3 py-1 bg-surface-container">
+<span class="text-xs font-bold uppercase tracking-widest">SEARCH...</span>
+</div>
+<span class="material-symbols-outlined text-3xl font-bold cursor-pointer hover:rotate-12 transition-transform">menu</span>
+</div>
+</div>
+</nav>
+<main class="max-w-[1000px] mx-auto px-6 py-12">
+<!-- Header Section -->
+<header class="mb-16 relative">
+<div class="absolute -top-10 -left-10 w-24 h-24 manga-halftone-heavy rounded-full z-0"></div>
+<div class="relative z-10">
+<div class="flex items-center gap-4 mb-4">
+<span class="bg-black text-white px-3 py-1 font-bold text-xs tracking-widest uppercase">DevLog</span>
+<span class="font-bold text-xs tracking-widest opacity-60">2024.03.20</span>
+<span class="font-bold text-xs tracking-widest opacity-60 flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">schedule</span> 15 MINS READ
+                    </span>
+</div>
+<h1 class="font-headline text-5xl md:text-7xl font-black tracking-tighter leading-none mb-8 hover:skew-y-[-1deg] transition-transform">
+                    深度解析：用漫画逻辑重构你的代码引擎
+                </h1>
+</div>
+</header>
+<!-- Opening Panel -->
+<section class="mb-16">
+<div class="sketch-border bg-white overflow-hidden group">
+<div class="aspect-video relative overflow-hidden">
+<img alt="Manga tech illustration" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Black and white high-contrast manga style illustration of a person interacting with floating glowing code symbols and digital gears, kinetic lines" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdj8dsGjsKkegvqBbozJRuH7gw_8d3lAhH5DXCB9hc8XpRGluetwiCh9rljtke5_y8mB4mzhQFH6P4_4S6Ml1__u26DRZdOcMl5qtxFMf11THAd0ernDej28qzKLcW08ZdckCEfugXte_Nzvuh93gg4VAH7Manu9F_7apUttmPU59yAOiKcZnJRpIldTVdBAigs9Wd94TTlxxE5N4hs9x1BlcIqMzouQB9d3_PhWlhkr7frMRrqncqb2WlfjiW08VuDYgJdTrCvjQk"/>
+<div class="absolute top-4 right-4 bg-black text-white px-4 py-2 font-black italic text-2xl skew-x-[-10deg]">
+                        START!
+                    </div>
+<div class="absolute inset-0 manga-halftone pointer-events-none"></div>
+</div>
+</div>
+</section>
+<!-- Article Content -->
+<article class="space-y-16">
+<!-- Paragraph 1 -->
+<div class="relative max-w-2xl mx-auto">
+<div class="absolute -inset-2 border-2 border-black -rotate-1 pointer-events-none"></div>
+<div class="bg-white p-8 relative">
+<p class="text-xl leading-relaxed font-medium">
+                        在现代软件开发的海洋中，我们常常迷失在复杂的抽象层级里。但是，如果你把每一个类、每一个函数都看作是一个漫画分镜呢？漫画家利用视觉流（Visual Flow）引导读者，而优秀的开发者则利用逻辑流引导数据。
+                    </p>
+</div>
+</div>
+<!-- Asymmetric Panel Layout -->
+<div class="grid md:grid-cols-2 gap-8 items-start">
+<div class="sketch-border bg-white p-6 rotate-1">
+<h3 class="font-headline font-black text-2xl mb-4 underline decoration-4 decoration-black">核心公式</h3>
+<p class="opacity-80">
+                        每一个模块都应该像一个完美的跨页大图。它必须承载足够的信息，但又不能让读者的视线感到疲劳。重构代码引擎的第一步，就是识别出那些“废话分镜”——那些冗余的、没有推动剧情发展的逻辑。
+                    </p>
+</div>
+<div class="relative pt-12">
+<div class="absolute top-0 right-0 font-black text-6xl opacity-10 italic">KA-BOOM!</div>
+<div class="bg-surface-container-high p-8 border-l-8 border-black">
+<p class="italic font-bold">
+                            "代码不是写给机器看的，而是写给未来的自己阅读的一本精彩冒险手册。"
+                        </p>
+</div>
+</div>
+</div>
+<!-- Code Block Section -->
+<div class="relative group">
+<div class="absolute -top-6 -left-4 bg-black text-white px-4 py-1 font-black z-20">BEEP BOOP!</div>
+<div class="sketch-border bg-primary text-on-primary font-mono p-8 overflow-x-auto relative">
+<div class="absolute inset-0 manga-halftone opacity-20 pointer-events-none"></div>
+<pre class="relative z-10 text-sm md:text-base"><code>class CodeEngine {
+  constructor(logic) {
+    this.frames = []; // 逻辑分镜
+    this.inkLevel = 100;
+  }
+
+  // 渲染逻辑
+  draw(panel) {
+    if (this.inkLevel &gt; 0) {
+      console.log(`Rendering logic frame: ${panel}`);
+      this.inkLevel -= 10;
+    } else {
+      throw new Error("OUT OF INK! REFILL COFFEE!");
+    }
+  }
+}</code></pre>
+</div>
+<div class="absolute -bottom-4 -right-2 bg-white border-2 border-black px-4 py-1 font-black text-sm">TERMINAL V1.0</div>
+</div>
+<!-- Speech Bubble Quote -->
+<div class="flex items-end gap-6 max-w-3xl mx-auto">
+<div class="w-24 h-24 shrink-0 relative hidden md:block">
+<img alt="Cute mascot peeking" class="w-full h-full object-contain" data-alt="Cute minimalist white cartoon cat character peeking from the side of a frame, manga style line art" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPgAeVIFS531_AbHSkfteP09GNntZn5N7yn3M8GS5dupvxRoBLiFEiYHYmjLym07xJOPBQum2PFVSFa3POfCYnpp8svppEDNo-QCRNgoMSoxFb2qP_vI_4UA9yHxX4Oc-3SlTMfP41ik-NRBlXriR-m331t4oZa6o2Rt2wTT7K2MVoXVMbqUvtv5BoSbas71DmD8430PMG4FE6R64-ENFymHp2qJ1HTmoh9pGE6r-QAu7alqll11T6QSwGTRRf7P1GNxW0aekBhum9"/>
+</div>
+<div class="flex-1 relative">
+<div class="sketch-border bg-white p-8 rounded-[40px] relative">
+<p class="text-2xl font-black leading-snug">
+                            记住，重构不是为了擦除过去，而是为了让未来的故事更流畅！✨
+                        </p>
+<!-- Bubble Tail -->
+<div class="absolute -left-4 bottom-8 w-8 h-8 bg-white border-l-2 border-b-2 border-black rotate-45"></div>
+</div>
+</div>
+</div>
+<!-- Screentone Texture Block -->
+<div class="p-12 manga-halftone-heavy border-4 border-black border-dashed flex flex-col items-center text-center">
+<h4 class="font-headline font-black text-3xl mb-4 italic">NEXT CHAPTER...</h4>
+<p class="max-w-md font-bold">
+                    在下一节中，我们将探讨如何利用“透视法”来处理多线程并发中的数据竞争问题。
+                </p>
+</div>
+</article>
+<!-- Actions Section -->
+<section class="mt-24 border-t-8 border-black pt-12 flex flex-col items-center">
+<button class="group relative inline-block mb-12">
+<div class="star-shape w-32 h-32 bg-black flex items-center justify-center group-hover:scale-110 transition-transform cursor-pointer">
+<span class="material-symbols-outlined text-white text-4xl" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<div class="absolute -top-4 -right-12 font-black text-xl italic group-hover:animate-bounce">LIKE!</div>
+</button>
+<!-- Comment Section -->
+<div class="w-full max-w-2xl space-y-8">
+<h3 class="font-headline font-black text-4xl tracking-tighter mb-8">读者留言 [3]</h3>
+<!-- Comment 1 -->
+<div class="flex gap-4">
+<div class="w-12 h-12 bg-black shrink-0"></div>
+<div class="flex-1">
+<div class="bg-surface-container-high p-4 sketch-border relative">
+<p class="font-bold text-sm mb-1">MangaDev_99</p>
+<p>这个重构逻辑太赞了！我以后写代码都会带上墨水瓶。</p>
+</div>
+</div>
+</div>
+<!-- Comment 2 -->
+<div class="flex flex-row-reverse gap-4">
+<div class="w-12 h-12 border-2 border-black bg-white shrink-0"></div>
+<div class="flex-1">
+<div class="bg-white p-4 sketch-border relative text-right">
+<p class="font-bold text-sm mb-1 text-zinc-500">RetroGamer</p>
+<p>那个代码块的 BEEP BOOP 很有灵魂，喜欢这个风格！</p>
+</div>
+</div>
+</div>
+<!-- Add Comment -->
+<div class="mt-12 p-6 bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+<textarea class="w-full p-4 bg-surface-container border-2 border-black font-bold focus:ring-0 focus:border-black placeholder:text-zinc-400 mb-4" placeholder="我也想说两句..." rows="3"></textarea>
+<button class="w-full bg-black text-white font-black py-3 uppercase tracking-widest hover:bg-zinc-800 transition-colors">
+                        SEND PANEL
+                    </button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full border-t-4 border-black dark:border-white mt-20 bg-white dark:bg-black">
+<div class="flex flex-col md:flex-row justify-between items-center w-full px-8 py-12 gap-6 max-w-[1440px] mx-auto">
+<div class="text-lg font-black text-black dark:text-white">
+                © 2024 MANGA_TECH - INK &amp; CODE
+            </div>
+<div class="flex gap-8">
+<a class="font-['Plus_Jakarta_Sans'] font-bold uppercase text-xs tracking-widest text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:scale-110 transition-transform" href="#">Privacy</a>
+<a class="font-['Plus_Jakarta_Sans'] font-bold uppercase text-xs tracking-widest text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:scale-110 transition-transform" href="#">Twitter (X)</a>
+<a class="font-['Plus_Jakarta_Sans'] font-bold uppercase text-xs tracking-widest text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:scale-110 transition-transform" href="#">RSS Feed</a>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-4 h-4 bg-black rounded-full"></div>
+<div class="w-4 h-4 manga-halftone-heavy w-4 h-4 rounded-full border border-black"></div>
+<div class="w-4 h-4 border-2 border-black rounded-full"></div>
+</div>
+</div>
+</footer>
+</body></html>
