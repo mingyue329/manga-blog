@@ -34,12 +34,14 @@
   - `src/data/home-page-content.ts`
   - `src/data/about-page-content.ts`
   - `src/data/posts-page-content.ts`
+  - `src/content/posts/*.md`
+  - `src/services/article-content-service.ts`
   - `src/services/api-client.ts`
   - `src/services/home-page-service.ts`
   - `src/services/about-page-service.ts`
   - `src/services/posts-page-service.ts`
 - 职责：
-  - 把静态内容配置与接口请求逻辑分开。
+  - 把页面静态配置、统一文章内容源与接口请求逻辑分开。
   - 保证未来改成真实 API 时，页面组件不用大改。
 
 ### 2.4 组件层
@@ -70,7 +72,41 @@
 - 开发阶段默认读本地配置。
 - 未来只要把 `VITE_USE_LOCAL_HOME_CONTENT` 设为 `false`，并让 `/api/home` 返回符合 `HomePageData` 的 JSON，就能切到真实接口。
 
-### 3.3 新页面已经接入真实 React 结构
+### 3.3 统一文章内容源
+
+当前文章系统不再由“列表页摘要数据 + 详情页 Markdown 正文”两份内容分别维护，而是统一成：
+
+- `src/content/posts/*.md`
+
+每篇 Markdown 文件同时承担两类信息：
+
+1. frontmatter 元数据
+2. 正文内容
+
+frontmatter 当前承载这些字段：
+
+- `slug`
+- `title`
+- `excerpt`
+- `publishedAt`
+- `author`
+- `categoryKey`
+- `image`
+- `coverRatio`
+- `imageSide`
+- `series`
+- `tags`
+- `featured`
+- `previewSections`
+
+统一后的好处是：
+
+- `/posts` 列表页直接从 Markdown frontmatter 派生卡片数据
+- `/posts/:slug` 详情页直接读取同一篇文章的正文和元数据
+- 首页“最新动态”也可以从同一份文章集合派生
+- 后续接后台或 CMS 时，迁移边界更清晰
+
+### 3.4 新页面已经接入真实 React 结构
 
 当前目录中已经存在这些 Stitch 导出稿：
 
@@ -103,11 +139,12 @@
 
 - 当前 `src/pages/posts/posts-page.tsx` 已经是归档列表页。
 - 当前 `src/pages/post-detail/post-detail-page.tsx` 已经实现了 `/posts/:slug`。
+- 当前 `src/services/article-content-service.ts` 负责把 Markdown frontmatter 解析成站点统一文章模型。
 - 文章详情页当前由三层组成：
   - `loader`: 从路由参数里读取 `slug`
-  - `service`: 组装文章摘要、Markdown 正文、上一篇 / 下一篇和相关文章
+  - `service`: 基于统一文章源组装文章摘要、Markdown 正文、上一篇 / 下一篇和相关文章
   - `page`: 只负责渲染统一后的详情布局
-- Markdown 正文单独放在 `src/content/posts/*.md`，这样内容编辑不需要直接修改 React 组件。
+- Markdown 正文和文章元数据都放在 `src/content/posts/*.md`，这样内容编辑不需要直接修改 React 组件或额外维护一份摘要配置。
 
 ### 4.3 接接口
 

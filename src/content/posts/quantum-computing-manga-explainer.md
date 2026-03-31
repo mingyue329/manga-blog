@@ -1,3 +1,27 @@
+---
+slug: quantum-computing-manga-explainer
+title: 深度解析：从物理底层理解量子计算的未来
+excerpt: 在这篇文章里，我尝试跳过复杂公式，用更直观的漫画式分镜去解释量子叠加、纠缠和容错为什么会改写未来的计算边界。
+publishedAt: '2024-03-15'
+author: Kawaii Code
+categoryKey: technical
+coverRatio: wide
+imageSide: left
+series: 技术漫谈
+tags:
+  - 开发日志
+  - 极客美学
+featured: true
+image:
+  src: https://lh3.googleusercontent.com/aida-public/AB6AXuBYhxXCG4DCU-LhBkMGIj6q5qlS8xsnYkWg_VRBOQ0JXRwg1MLknNDUXxaeyKrRxyBQrIKZH5-311louNtG3zx-jdMvQbCaKoqVC_rkQL8zmGNskng79u4g6JfCQhNSg-WSrkQF1tCr34nwPwLQvuLR_5G-xc-_ulpe6KDMqbyak6KauK337eI4W_Sf9TPZuj6hHNZ8vfLglbsp12gjXpkHFQ0dYiXFvDKHxRC0AU0n_QEa-pfbonRrYgZQsoS7Zn7MxC1jDfGOXvj5
+  alt: 黑白漫画风格的代码与终端屏幕
+previewSections:
+  - heading: 为什么要用故事讲量子计算
+    content: 如果一开始就用线性代数和态向量轰炸读者，大部分人会在第一页就失去兴趣。我的做法是先建立直觉：把量子位看成一个会同时站在多个时间线上的角色，让读者先理解“为什么它和普通比特不同”。
+  - heading: 真正值得关注的不是神秘感，而是误差控制
+    content: 量子计算的浪漫之处在于它像魔法，量子计算的现实之处在于它极度脆弱。真正决定产业化速度的，不是宣传里那些震撼词，而是纠错码、退相干时间和工程可靠性。
+---
+
 很多人第一次接触量子计算时，会被“叠加态”“纠缠”“量子霸权”这些词迅速拉走注意力。它们很酷，但如果一开始就停在这些名词上，最后往往只会得到一种模糊的神秘感，而不是可用的理解框架。
 
 ## 先别急着记公式，先建立画面

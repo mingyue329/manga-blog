@@ -1,10 +1,10 @@
-import type { HomePageData } from '@/types/content'
+import type { HomePageStaticContent } from '@/types/content'
 
 /**
  * 首页静态内容配置。
- * 当前版本先使用本地数据驱动页面，等后续接接口时只需要替换 service 层即可。
+ * 这里保留页面固定文案和视觉信息；“最新动态”里的文章卡片会由统一文章内容源动态生成。
  */
-export const homePageContent: HomePageData = {
+export const homePageContent: HomePageStaticContent = {
   hero: {
     speechBubble: 'Hello_World',
     titleLead: '欢迎来到',
@@ -42,44 +42,6 @@ export const homePageContent: HomePageData = {
       label: '查看全部 +',
       to: '/posts',
     },
-    items: [
-      {
-        tag: 'DevLog',
-        title: '如何用 Rust 重构我的萌系引擎',
-        description:
-          '深入拆解我把性能优化、工具链整理和二次元视觉表达合并到同一套引擎里的全过程。',
-        date: '2024.05.20',
-        to: '/posts',
-        image: {
-          src: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDKfaGDfw41oumydScE06iAIurMFNh1ISrlX1Y9kRZjYhyEFBO1N1e1ZDz2PyaNHW5KjDSqdwIXevOPL4Z8Z5zeRWMYq6YUfWF-O01n-Nfancl4wiEfhfkIX5Dl8mAnk5BEY3O4_bzv22HWpq3TijcCV_qIIM8p8F6iqqERYtOU3HghLpWXA4ne2dydz3J-1ItjQbQQB-8l2TI20QaUXa8ufFGmV0-xyOeb8UCtboGSdX7z3-oST0pJTZif-yaQvRSWs9E1Oh-mOWER',
-          alt: '黑白风格的技术文章封面图',
-        },
-      },
-      {
-        tag: 'Review',
-        title: '2024 必玩的独立萌系游戏推荐',
-        description:
-          '从像素美术到手绘叙事，这些独立游戏不仅好玩，而且每一款都有强烈的作者表达。',
-        date: '2024.05.15',
-        to: '/posts',
-        image: {
-          src: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCC-GNnH8cCybPduR_0FMJa4KqOML-iYDH55SqfjV8k0K6gFqJNNOtbRUGF785YLSQst8Yc5x0n1eWTg9SlwwgmGsCKPVUZaXS6A6pi4eidnS2MvMbaV3hWSP4mEyfgm5bEYCK7vIkNqMgdFH2MUHDTcFh7HHPwqkimL55d9xxuPTV2sovAZIBDWYgeb9n7EyU1vSIiUUk587lMqifpDWYOEW8j0VWenQbLDTolIR0_U-8juWXAr1j_yVAZ9KAx38Kvs3XgIKDfKVcr',
-          alt: '黑白风格的游戏评测封面图',
-        },
-      },
-      {
-        tag: 'Opinion',
-        title: '为什么极客都爱黑白极简主义？',
-        description:
-          '聊聊当色彩被压缩到最少之后，为什么结构、节奏和信息密度反而会变得更有力量。',
-        date: '2024.05.08',
-        to: '/posts',
-        image: {
-          src: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC7jXtH_4KjVXJNEJodB22tcooK64cRK4BC-7GIsuGJbF85fmnXZfmLd5Eoz-SCK3_eZG9hD82k3mr9abKKibkOhQtnO2IgYxzO5bSBF1QfYhLv_6V3kPeRLj4AarnUJuVV7XQxFXnr0TO5XScOpf097LU4wgwymrl_0W5kl91GxbLefBBsuKN56dfH4ozhhm_eb-0QfXWBGGO0bYsb2UrRyNsQJt5dwVZAwnqbm7FWk0wjbB5MVXa-WKzkyrJzjSI92moU7iziwX50',
-          alt: '黑白风格的观点文章封面图',
-        },
-      },
-    ],
   },
   playing: {
     title: '正在游玩 // PLAYING',

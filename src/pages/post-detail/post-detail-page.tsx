@@ -15,6 +15,8 @@ import { PostMarkdown } from '@/components/posts/post-markdown'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { getPostCoverRatioClass } from '@/lib/post-cover-ratio'
+import { cn } from '@/lib/utils'
 import type {
   ArchivePost,
   PostDetailPageData,
@@ -115,6 +117,66 @@ function renderStorySeedItems(post: ArchivePost): ReactElement[] {
 }
 
 /**
+ * 渲染标题下方的文章摘要信息。
+ * author、series 与 featured 都来自 frontmatter，因此这里集中把它们转成用户能直接理解的阅读提示，而不是把这些字段藏在数据层里。
+ */
+function renderArticleSummaryLine(post: ArchivePost): ReactElement {
+  const summaryParts = [
+    `By ${post.author}`,
+    post.series ? `Series ${post.series}` : 'Series 单篇文章',
+    `Cover ${post.coverRatio}`,
+  ]
+
+  return (
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm font-black uppercase tracking-[0.16em] text-black/48">
+      {summaryParts.map((summaryPart) => (
+        <span key={summaryPart}>{summaryPart}</span>
+      ))}
+      {post.featured ? <Badge variant="outlineInk">精选文章</Badge> : null}
+    </div>
+  )
+}
+
+/**
+ * 渲染文章详情页头图右侧的补充事实卡片。
+ * 这些信息和正文相比更偏“阅读上下文”，适合放在头图旁边，帮助读者快速判断这篇文章属于谁、属于哪条内容线以及当前推荐等级。
+ */
+function renderArticleFactItems(post: ArchivePost): ReactElement[] {
+  const factItems = [
+    {
+      label: 'Author',
+      value: post.author,
+    },
+    {
+      label: 'Series',
+      value: post.series ?? '独立篇章',
+    },
+    {
+      label: 'Cover Ratio',
+      value: post.coverRatio,
+    },
+    {
+      label: 'Featured',
+      value: post.featured ? 'Yes' : 'No',
+    },
+  ]
+
+  return factItems.map((factItem) => (
+    <div
+      key={`${factItem.label}-${factItem.value}`}
+      className="border-2 border-black bg-white px-4 py-3"
+    >
+      <p className="text-[0.68rem] font-black uppercase tracking-[0.2em] text-black/48">
+        {factItem.label}
+      </p>
+      <p className="mt-2 font-heading text-sm font-black uppercase tracking-[0.14em]">
+        {factItem.value}
+      </p>
+    </div>
+  ))
+}
+
+/**
  * 渲染上一篇或下一篇导航卡片。
  * 详情页的长文阅读结束后，用户通常会继续跳转，因此这里用更显眼的卡片而不是普通文字链接。
  */
@@ -163,7 +225,12 @@ function renderRelatedPostCards(
       <Link key={relatedPost.slug} to={relatedPost.to} className="group block h-full">
         <Card className="h-full overflow-hidden border-4 border-black bg-white py-0 transition-transform duration-200 group-hover:-translate-y-1 group-hover:shadow-[10px_10px_0_0_#111111]">
           <CardContent className="p-0">
-            <div className="relative aspect-[16/10] overflow-hidden border-b-4 border-black">
+            <div
+              className={cn(
+                'relative overflow-hidden border-b-4 border-black',
+                getPostCoverRatioClass(relatedPost.coverRatio),
+              )}
+            >
               <img
                 src={relatedPost.image.src}
                 alt={relatedPost.image.alt}
@@ -175,6 +242,9 @@ function renderRelatedPostCards(
             <div className="space-y-4 p-6">
               <div className="flex flex-wrap items-center gap-3">
                 <Badge variant="ink">{relatedPost.categoryLabel}</Badge>
+                {relatedPost.series ? (
+                  <Badge variant="outlineInk">{relatedPost.series}</Badge>
+                ) : null}
                 <span className="text-xs font-black uppercase tracking-[0.18em] text-black/42">
                   {relatedPost.date}
                 </span>
@@ -237,6 +307,7 @@ export function PostDetailPage(): ReactElement {
           <p className="max-w-3xl text-lg leading-8 text-black/72 md:text-xl">
             {pageData.post.excerpt}
           </p>
+          {renderArticleSummaryLine(pageData.post)}
         </div>
         <div className="grid gap-4 md:grid-cols-3">
           {renderArticleMetaItems(articleMetaItems)}
@@ -246,7 +317,12 @@ export function PostDetailPage(): ReactElement {
       <section className="space-y-8">
         <Card className="overflow-hidden border-4 border-black bg-white py-0 manga-panel">
           <CardContent className="grid gap-0 p-0 lg:grid-cols-[minmax(0,1.4fr)_320px]">
-            <div className="relative aspect-[16/10] overflow-hidden border-b-4 border-black lg:aspect-auto lg:border-b-0 lg:border-r-4">
+            <div
+              className={cn(
+                'relative overflow-hidden border-b-4 border-black lg:aspect-auto lg:border-b-0 lg:border-r-4',
+                getPostCoverRatioClass(pageData.post.coverRatio),
+              )}
+            >
               <img
                 src={pageData.post.image.src}
                 alt={pageData.post.image.alt}
@@ -268,6 +344,9 @@ export function PostDetailPage(): ReactElement {
                 </p>
               </div>
               <ul className="space-y-4">{renderStorySeedItems(pageData.post)}</ul>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {renderArticleFactItems(pageData.post)}
+              </div>
               <div className="border-4 border-black bg-secondary px-5 py-4">
                 <p className="text-sm font-bold leading-7 text-black/80">
                   “这页虽然参考了 Stitch 的文章详情布局，但视觉语气已经收回到当前站点的黑白漫画体系里。”

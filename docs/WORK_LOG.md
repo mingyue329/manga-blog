@@ -56,3 +56,45 @@
 - 在 `src/content/posts` 下补充 Markdown 正文文档，把中心内容区改为 Markdown 渲染，而不是继续把正文硬编码在 TS 文件里。
 - 新增 `PostMarkdown` 组件，统一处理标题、段落、引用、列表、表格和代码块样式。
 - 调整归档页和预览抽屉入口，让用户可以从 `/posts` 直接进入真实详情页。
+
+## 2026-04-01
+
+### 本次完成
+
+- 把文章列表页、文章详情页和首页“最新动态”统一到同一份 Markdown 内容源。
+- 为 `src/content/posts/*.md` 增加 frontmatter，收拢文章标题、摘要、日期、封面、标签和预览分节。
+- 新增 `src/services/article-content-service.ts`，统一负责解析 Markdown frontmatter 并派生文章卡片数据。
+- 调整 `home-page-service.ts`，让首页最新动态改为从统一文章源自动生成。
+- 调整 `posts-page-service.ts`，让归档页文章列表和标签列表都从统一文章源派生。
+- 继续扩展 Markdown frontmatter，为每篇文章补入 `author`、`coverRatio`、`series` 和 `featured`。
+- 调整文章类型定义与 `article-content-service.ts`，让新增字段从 frontmatter 一路进入归档页、详情页和首页推荐区。
+- 调整文章详情页与归档页展示，让作者、系列、封面比例和精选状态不再停留在数据层。
+- 重写 `post-detail-page-service.ts`，让详情页不再依赖旧的静态摘要配置。
+- 将 `src/data/home-page-content.ts` 与 `src/data/posts-page-content.ts` 收敛为页面固定配置，不再重复维护文章内容。
+- 把站点顶部改成半透明描图纸风格，在保留点阵背景透出的同时提升导航层次和可读性。
+- 调整全局点阵背景参数，把点距缩小到原来的一半，并同步缩小基础点与聚焦点尺寸，让背景更细密。
+- 继续加重顶部描图纸 Header 的外框厚度，让它和全站黑白粗边框语言更一致。
+- 把全站内容区最大宽度从 1280px 扩到 1480px，减少超宽屏下两侧留白过多的问题。
+- 修正首页底部“正在游玩 / 技术栈”卡片的溢出裁切，让顶部黑色标签不再被卡片边界挡住。
+
+### 已验证
+
+- `pnpm typecheck`
+- `pnpm build`
+- `pnpm lint`
+- 本地预览下检查了：
+  - 首页“最新动态”已切到统一文章源
+  - `/posts` 归档页仍可正常展示文章卡片与标签筛选
+  - `/posts/:slug` 详情页仍可正常读取 Markdown 正文
+  - 运行时已消除 frontmatter 解析导致的浏览器错误
+
+### 当前状态
+
+- 当前文章相关的前台展示已经统一使用 `src/content/posts/*.md` 作为内容源。
+- 页面静态文案与文章内容已经完成拆层，后续前台继续扩展会更稳。
+
+### 后续建议
+
+1. 下一步可以继续补文章目录导航、系列聚合页或更细的封面裁剪策略。
+2. 如果后面准备接后台，可以直接围绕现在这套 frontmatter 字段设计接口。
+3. 文章数量变多后，可以继续补目录导航、文章系列和代码高亮增强。

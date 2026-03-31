@@ -1,3 +1,27 @@
+---
+slug: retro-hardware-diary
+title: 复古硬件手记：我为什么还在收老键盘和老相机
+excerpt: 有些设备并不高效，却能提醒我技术不是只追求新和快，它也可以关于触感、声音、重量，以及人与工具之间的关系。
+publishedAt: '2024-01-18'
+author: Kawaii Code
+categoryKey: culture
+coverRatio: landscape
+imageSide: left
+series: 复古硬件日志
+tags:
+  - 硬件DIY
+  - 漫展日常
+featured: false
+image:
+  src: https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=1200&q=80
+  alt: 黑白风格的复古相机与桌面设备
+previewSections:
+  - heading: 老设备的价值不是怀旧滤镜
+    content: 我喜欢老设备，不是因为它们“有年代感”，而是因为它们的交互逻辑往往更直接，制造方式更坦诚。你能很明显感受到设计者在当时做过怎样的取舍。
+  - heading: 收藏最终会反过来影响写代码的方式
+    content: 当你长期接触这些被打磨过的工具，就会更在意产品里的物理感和节奏感。哪怕是写一个网页按钮，也会开始在意反馈是否清脆、布局是否有力度。
+---
+
 在效率至上的技术语境里，收藏老设备常常显得有点“不合时宜”。它们不够轻，不够快，也不够智能，但正因为如此，它们会不断提醒我：技术从来不只是追求指标，它也关乎触感、声音、重量，以及人与工具之间那种被时间慢慢磨出来的关系。
 
 ## 老设备最迷人的地方，不是怀旧滤镜

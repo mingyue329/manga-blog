@@ -1,3 +1,27 @@
+---
+slug: designing-with-screentones
+title: 用网点和速度线重建技术博客的视觉节奏
+excerpt: 当你把传统 UI 里的轻边框换成漫画网点、偏移阴影和不对称标题后，页面会立刻摆脱模板感，这篇文章专门聊我是怎么做的。
+publishedAt: '2024-02-06'
+author: Kawaii Code
+categoryKey: devlog
+coverRatio: square
+imageSide: right
+series: 视觉系统
+tags:
+  - 开发日志
+  - 极客美学
+featured: true
+image:
+  src: https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=1200&q=80
+  alt: 黑白风格的设计与代码工作台
+previewSections:
+  - heading: 先拆语气，再拆视觉
+    content: 设计风格不是“加点装饰”就成立的，它首先是语气。这个博客的语气是张扬、锋利、热血，但不能吵，所以我先定义标题、边框、阴影和留白各自承担什么情绪，再决定具体元素。
+  - heading: 真正有用的是一套可重复的视觉语法
+    content: 如果每一块都靠灵感做，最终只会很乱。可维护的做法是抽象出稳定规则：哪些地方允许黑底白字，哪些地方用网点，哪些按钮必须留实边框，剩下的变化才有边界。
+---
+
 很多技术站点的问题不在于信息不够，而在于情绪几乎被清空了。大家都在追求“干净”“理性”“专业”，结果最后做出来的页面常常只是安全、平整、没有记忆点。
 
 ## 我想要的不是装饰，而是语气

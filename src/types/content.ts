@@ -124,6 +124,7 @@ export interface UpdateArticle {
   date: string
   to: string
   image: ImageAsset
+  featured: boolean
 }
 
 /**
@@ -133,6 +134,14 @@ export interface UpdatesSectionData {
   title: string
   viewAllLink: NavigationLink
   items: UpdateArticle[]
+}
+
+/**
+ * 表示首页中不包含文章列表项的静态配置。
+ * 首页里的“最新动态”卡片将由统一的文章内容源生成，因此这里仅保留固定文案和跳转配置。
+ */
+export type HomePageStaticContent = Omit<HomePageData, 'updates'> & {
+  updates: Omit<UpdatesSectionData, 'items'>
 }
 
 /**
@@ -275,6 +284,12 @@ export type PostCategoryKey =
   | 'culture'
 
 /**
+ * 表示文章封面图在前台页面中的展示比例。
+ * 这里不直接把宽高比写死到组件里，而是先收敛成统一枚举，便于后续继续从 frontmatter 或接口控制封面排版。
+ */
+export type PostCoverRatio = 'portrait' | 'square' | 'landscape' | 'wide'
+
+/**
  * 表示文章预览中的一个内容段落。
  */
 export interface PostPreviewSection {
@@ -290,12 +305,37 @@ export interface ArchivePost {
   title: string
   excerpt: string
   date: string
+  author: string
   categoryKey: PostCategoryKey
   categoryLabel: string
   image: ImageAsset
+  coverRatio: PostCoverRatio
   imageSide: 'left' | 'right'
+  series: string | null
   tags: string[]
+  featured: boolean
   previewSections: PostPreviewSection[]
+}
+
+/**
+ * 表示统一文章内容源中的一篇 Markdown 文档。
+ * 这个类型位于 ArchivePost 之下，是更底层的“原始内容模型”，同时携带 frontmatter 元数据和正文内容。
+ */
+export interface MarkdownPostDocument {
+  slug: string
+  title: string
+  excerpt: string
+  publishedAt: string
+  author: string
+  categoryKey: PostCategoryKey
+  image: ImageAsset
+  coverRatio: PostCoverRatio
+  imageSide: 'left' | 'right'
+  series: string | null
+  tags: string[]
+  featured: boolean
+  previewSections: PostPreviewSection[]
+  markdownContent: string
 }
 
 /**
@@ -323,6 +363,15 @@ export interface PostsArchivePageData {
 }
 
 /**
+ * 表示归档页中不包含文章列表与标签列表的静态配置。
+ * 真正的文章卡片和标签集合会从统一 Markdown 内容源派生出来，因此这里只保留页面固定文案。
+ */
+export type PostsArchivePageStaticContent = Omit<
+  PostsArchivePageData,
+  'posts' | 'tags'
+>
+
+/**
  * 表示文章详情页中可复用的文章跳转摘要。
  * 这个结构会同时服务于“上一篇 / 下一篇”和“相关文章”区域，避免不同区域各自维护一套近似字段。
  */
@@ -334,6 +383,8 @@ export interface PostReference {
   categoryLabel: string
   tags: string[]
   image: ImageAsset
+  coverRatio: PostCoverRatio
+  series: string | null
   to: string
 }
 

@@ -1,3 +1,27 @@
+---
+slug: akihabara-geek-pilgrimage
+title: Akihabara：极客灵魂的朝圣之旅
+excerpt: 在秋叶原，硬件和文化从来不是两条线。二手元件店、老游戏机、同人刊和地下工作室构成了一种独有的技术生活方式。
+publishedAt: '2024-03-02'
+author: Kawaii Code
+categoryKey: geek-life
+coverRatio: portrait
+imageSide: right
+series: 极客巡礼
+tags:
+  - 漫展日常
+  - 极客美学
+featured: false
+image:
+  src: https://lh3.googleusercontent.com/aida-public/AB6AXuC5AtSV-FS3eil16NmQljlvNuXB4zsE9_KDp3nPySSe6PgiCeELQWEOl91FCdiESGHzrW8nkogjmId-Q4c1wNeGd7DxBTE16xLQGFx0OzPBnh0Wq6qE5TuTraH1nToMArJr-Zm4RnOUxpEh-sd3J1GcsZy0BfVGOpi8CslCVD3uCwEEBIL8rr44EYrARiKE7iea7P4IjT-6FlRL5BdWW1PRoBS5Ly94E_vSWkXV1ZR8TXDYSMMYW6rmrwZkU1z3IMMlUkl40jtucuQx
+  alt: 黑白漫画风格的爆炸式视觉特效
+previewSections:
+  - heading: 为什么秋叶原不是简单的购物地标
+    content: 真正吸引我的不是“买到什么”，而是“在那里会被怎样的创造欲包围”。你会在同一条街上看到元件、模型、漫画、游戏和独立开发者留下的痕迹，这种密度本身就很罕见。
+  - heading: 硬件考古和文化朝圣是同一件事
+    content: 当你拿起一块老式声卡或者翻到一本九十年代的技术杂志时，那不是简单的怀旧，而是重新理解一代创作者如何在当时的约束条件下做出今天仍有生命力的作品。
+---
+
 秋叶原最迷人的地方，从来不是“东西很多”，而是“创造欲在同一个街区里被放大得非常具体”。你可以在十分钟内从二手电子元件店走到同人志卖场，再从老游戏机柜台拐进模型店，这种密度本身就是一种罕见体验。
 
 ## 真正吸引我的，是技术和文化没有被强行分开

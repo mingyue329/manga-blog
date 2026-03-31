@@ -25,6 +25,11 @@ function renderUpdateCard(item: UpdateArticle): ReactElement {
     <Link key={item.title} to={item.to} className="group block h-full">
       <Card className="h-full overflow-hidden border-4 border-black bg-white py-0 transition-transform duration-300 manga-panel group-hover:-translate-y-2">
         <div className="relative h-56 overflow-hidden border-b-4 border-black">
+          {item.featured ? (
+            <div className="absolute right-4 top-4 z-20 border-2 border-black bg-white px-3 py-1 text-[0.68rem] font-black uppercase tracking-[0.2em]">
+              Featured
+            </div>
+          ) : null}
           <div className="manga-halftone absolute inset-0 z-10 text-black/15 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
           <img
             src={item.image.src}
@@ -34,7 +39,10 @@ function renderUpdateCard(item: UpdateArticle): ReactElement {
           />
         </div>
         <CardContent className="space-y-4 p-6">
-          <Badge variant="ink">{item.tag}</Badge>
+          <div className="flex flex-wrap items-center gap-3">
+            <Badge variant="ink">{item.tag}</Badge>
+            {item.featured ? <Badge variant="outlineInk">推荐阅读</Badge> : null}
+          </div>
           <CardTitle className="font-heading text-2xl font-black leading-tight transition-transform group-hover:translate-x-1">
             {item.title}
           </CardTitle>

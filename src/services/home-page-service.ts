@@ -1,4 +1,5 @@
 import { homePageContent } from '@/data/home-page-content'
+import { getLatestUpdateArticles } from '@/services/article-content-service'
 import { requestJson } from '@/services/api-client'
 import type { HomePageData } from '@/types/content'
 
@@ -10,7 +11,13 @@ const HOME_PAGE_ENDPOINT = '/home'
  */
 export async function getHomePageContent(): Promise<HomePageData> {
   if (import.meta.env.VITE_USE_LOCAL_HOME_CONTENT !== 'false') {
-    return structuredClone(homePageContent)
+    return {
+      ...structuredClone(homePageContent),
+      updates: {
+        ...structuredClone(homePageContent.updates),
+        items: getLatestUpdateArticles(3),
+      },
+    }
   }
 
   return requestJson<HomePageData>(HOME_PAGE_ENDPOINT)

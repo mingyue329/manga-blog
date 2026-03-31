@@ -56,7 +56,7 @@ export function PlayingAndStackSection({
     <section className="grid gap-10 lg:grid-cols-2">
       <Card
         id="playing"
-        className="relative overflow-hidden border-4 border-black bg-white py-0 manga-panel"
+        className="relative overflow-visible border-4 border-black bg-white py-0 manga-panel"
       >
         <span className="absolute left-6 top-0 -translate-y-1/2 border-4 border-black bg-black px-5 py-2 font-heading text-xl font-black text-white">
           {playing.title}
@@ -84,7 +84,7 @@ export function PlayingAndStackSection({
 
       <Card
         id="stack"
-        className="relative overflow-hidden border-4 border-black bg-white py-0 manga-panel-reverse"
+        className="relative overflow-visible border-4 border-black bg-white py-0 manga-panel-reverse"
       >
         <span className="absolute right-6 top-0 -translate-y-1/2 border-4 border-black bg-black px-5 py-2 font-heading text-xl font-black text-white">
           {stack.title}

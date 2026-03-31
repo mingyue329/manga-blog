@@ -1,3 +1,7 @@
+import {
+  getAllArchivePosts,
+  getAllArticleTags,
+} from '@/services/article-content-service'
 import { postsArchivePageContent } from '@/data/posts-page-content'
 import { requestJson } from '@/services/api-client'
 import type { PostsArchivePageData } from '@/types/content'
@@ -10,7 +14,11 @@ const POSTS_ARCHIVE_ENDPOINT = '/posts'
  */
 export async function getPostsArchivePageContent(): Promise<PostsArchivePageData> {
   if (import.meta.env.VITE_USE_LOCAL_POSTS_CONTENT !== 'false') {
-    return structuredClone(postsArchivePageContent)
+    return {
+      ...structuredClone(postsArchivePageContent),
+      tags: getAllArticleTags(),
+      posts: getAllArchivePosts(),
+    }
   }
 
   return requestJson<PostsArchivePageData>(POSTS_ARCHIVE_ENDPOINT)

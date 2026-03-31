@@ -47,7 +47,7 @@ function parsePageNumber(pageValue: string | null): number {
 
 /**
  * 判断文章是否命中关键词搜索。
- * 搜索范围包括标题、摘要、标签和分类，便于用户用自然方式快速缩小结果。
+ * 搜索范围包括标题、摘要、作者、系列、标签和分类，便于用户用自然方式快速缩小结果。
  */
 function matchesSearchKeyword(post: ArchivePost, keyword: string): boolean {
   if (!keyword) {
@@ -58,6 +58,8 @@ function matchesSearchKeyword(post: ArchivePost, keyword: string): boolean {
   const searchableText = [
     post.title,
     post.excerpt,
+    post.author,
+    post.series ?? '',
     post.categoryLabel,
     ...post.tags,
   ]

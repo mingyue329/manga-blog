@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { getPostCoverRatioClass } from '@/lib/post-cover-ratio'
 import { cn } from '@/lib/utils'
 import type { ArchivePost } from '@/types/content'
 
@@ -45,6 +46,20 @@ function renderArchiveHeader(resultCount: number): ReactElement {
 }
 
 /**
+ * 渲染文章卡片里的补充元信息。
+ * 新增的 author 与 series 字段不应该只停留在 frontmatter 层，因此这里把它们直接露出到列表视图，方便用户快速建立文章上下文。
+ */
+function renderPostMetaLine(post: ArchivePost): ReactElement {
+  return (
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-black uppercase tracking-[0.16em] text-black/48">
+      <span>By {post.author}</span>
+      <span>Cover {post.coverRatio}</span>
+      <span>{post.series ? `Series ${post.series}` : 'Series 单篇文章'}</span>
+    </div>
+  )
+}
+
+/**
  * 渲染单篇文章卡片。
  * 卡片现在同时支持“阅读全文”和“快速预览”两种路径，这样既补上真实详情页，又保留原来的轻量浏览方式。
  */
@@ -63,7 +78,12 @@ function renderArchivePostCard(
           post.imageSide === 'right' ? 'md:order-last' : '',
         )}
       >
-        <CardContent className="relative aspect-[4/3] p-0">
+        <CardContent
+          className={cn(
+            'relative p-0',
+            getPostCoverRatioClass(post.coverRatio),
+          )}
+        >
           <img
             src={post.image.src}
             alt={post.image.alt}
@@ -78,11 +98,13 @@ function renderArchivePostCard(
         <div className="mb-4 flex flex-wrap items-center gap-3">
           <Badge variant="ink">{post.date}</Badge>
           <Badge variant="outlineInk">{post.categoryLabel}</Badge>
+          {post.featured ? <Badge variant="outlineInk">推荐</Badge> : null}
         </div>
         <h2 className="mb-4 font-heading text-3xl font-black tracking-tight transition-transform group-hover:translate-x-1 md:text-4xl">
           {post.title}
         </h2>
         <p className="mb-6 text-lg leading-8 text-black/70">{post.excerpt}</p>
+        <div className="mb-5">{renderPostMetaLine(post)}</div>
         <div className="flex flex-wrap gap-3">
           {post.tags.map((tag) => (
             <span

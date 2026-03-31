@@ -1,3 +1,27 @@
+---
+slug: build-your-insomniac-server
+title: 如何构建属于你的“不眠”服务器？
+excerpt: 从树莓派到机架式设备，这篇文章把家庭实验室的搭建过程拆成清晰步骤，帮助你构建长期稳定运行的个人服务节点。
+publishedAt: '2024-02-20'
+author: Kawaii Code
+categoryKey: tutorial
+coverRatio: landscape
+imageSide: left
+series: 自建实验室
+tags:
+  - 教程拆解
+  - 硬件DIY
+featured: true
+image:
+  src: https://lh3.googleusercontent.com/aida-public/AB6AXuDkqwtJplAOghcw7VtIX_uyUif-cr6wKrSA2W-tEgix3dd0_9M4xdlYXHupVdA93o_uIwQnArW_pL9VDBH3brnBKF52JvxvuVBv8ADVbCHImEZA65VcTzzhVLsW29_XoLHZQH_XNYhsQqe0lajAL9p7v8A1MfPP7xzLY9MkStBISZwpt50T8JkB1UzQMiYjHQw6tq1hu0-WsJQZcAT5plk7_RogumKJwAAaFaerNVHznBZTFUOInzruxvE8QuoF743L4qSNop6QcKPW
+  alt: 黑白漫画风格的桌面与键盘布局
+previewSections:
+  - heading: 先明确服务目标，再选硬件
+    content: 很多人上来就堆配置，最后机器很强，但用途很散。正确顺序应该是先问清楚要跑什么：是媒体库、自动化脚本、个人博客，还是研发测试环境。用途决定硬件，不是反过来。
+  - heading: 稳定运行比峰值性能更重要
+    content: 家庭服务器最怕的不是跑不快，而是半夜掉线没人知道。所以我的建议永远是优先关注散热、磁盘策略、备份方案和监控，而不是先纠结 CPU 多几个核。
+---
+
 家庭服务器最容易被误解成一份硬件清单，但真正决定体验的，往往不是配置表，而是你有没有先想清楚它到底承担什么角色。
 
 ## 第一步：先定义目标，再决定机器

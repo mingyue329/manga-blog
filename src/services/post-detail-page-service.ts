@@ -1,4 +1,7 @@
-import { postsArchivePageContent } from '@/data/posts-page-content'
+import {
+  getAllArchivePosts,
+  getMarkdownPostDocumentBySlug,
+} from '@/services/article-content-service'
 import { requestJson } from '@/services/api-client'
 import type {
   ArchivePost,
@@ -8,65 +11,25 @@ import type {
 
 const POST_DETAIL_ENDPOINT = '/posts'
 const LOCAL_POST_DETAIL_CONTENT_FLAG = 'VITE_USE_LOCAL_POST_DETAIL_CONTENT'
-const articleMarkdownDocuments = import.meta.glob('../content/posts/*.md', {
-  query: '?raw',
-  import: 'default',
-  eager: true,
-}) as Record<string, string>
 
 /**
- * 从 Markdown 模块路径中提取文章 slug。
- * 这样内容文件只需要按“slug.md”命名，就能自动和路由、数据层建立映射关系。
+ * 在归档文章列表中查找当前文章。
+ * 详情页需要卡片摘要信息和正文内容两套数据，因此这里从统一文章集合中取出对应的归档模型。
  */
-function getMarkdownSlugFromModulePath(modulePath: string): string {
-  const pathSegments = modulePath.split('/')
-  const fileName = pathSegments[pathSegments.length - 1] ?? ''
-
-  return fileName.replace(/\.md$/u, '')
-}
-
-/**
- * 根据文章 slug 读取本地 Markdown 文档内容。
- * 如果未来把内容迁移到 CMS 或后端接口，这里就是最自然的替换点。
- */
-function getMarkdownContentBySlug(slug: string): string | null {
-  for (const [modulePath, markdownContent] of Object.entries(
-    articleMarkdownDocuments,
-  )) {
-    if (getMarkdownSlugFromModulePath(modulePath) === slug) {
-      return markdownContent
+function getArchivePostBySlug(
+  archivePosts: ArchivePost[],
+  slug: string,
+): ArchivePost {
+  for (const archivePost of archivePosts) {
+    if (archivePost.slug === slug) {
+      return archivePost
     }
   }
 
-  return null
-}
-
-/**
- * 为还没有独立 Markdown 文件的文章生成兜底正文。
- * 这样即使内容团队暂时只维护了摘要和预览分节，详情页依然可以稳定渲染。
- */
-function buildFallbackMarkdown(post: ArchivePost): string {
-  const markdownLines: string[] = [
-    `## 开场`,
-    '',
-    post.excerpt,
-    '',
-  ]
-
-  for (const previewSection of post.previewSections) {
-    markdownLines.push(`## ${previewSection.heading}`)
-    markdownLines.push('')
-    markdownLines.push(previewSection.content)
-    markdownLines.push('')
-  }
-
-  markdownLines.push('## 延伸阅读')
-  markdownLines.push('')
-  markdownLines.push(
-    '这篇文章当前还没有独立维护的 Markdown 文档，因此详情页正文由摘要和分节内容自动拼接生成。',
-  )
-
-  return markdownLines.join('\n')
+  throw new Response('未找到对应文章。', {
+    status: 404,
+    statusText: '未找到对应文章。',
+  })
 }
 
 /**
@@ -112,37 +75,22 @@ function buildPostReference(post: ArchivePost): PostReference {
     categoryLabel: post.categoryLabel,
     tags: [...post.tags],
     image: { ...post.image },
+    coverRatio: post.coverRatio,
+    series: post.series,
     to: `/posts/${post.slug}`,
   }
 }
 
 /**
- * 在本地文章列表中查找目标文章。
- * 如果 slug 无效，这里直接抛出 404 响应，让路由错误边界按“未找到页面”的方式处理。
- */
-function getArchivePostBySlug(slug: string): ArchivePost {
-  for (const post of postsArchivePageContent.posts) {
-    if (post.slug === slug) {
-      return structuredClone(post)
-    }
-  }
-
-  throw new Response('未找到对应文章。', {
-    status: 404,
-    statusText: '未找到对应文章。',
-  })
-}
-
-/**
  * 按当前位置读取相邻文章。
- * 详情页底部的上一篇 / 下一篇导航只依赖列表顺序，因此用偏移量读取最直观。
+ * 详情页底部的上一篇 / 下一篇导航只依赖统一文章排序，因此用偏移量读取最直观。
  */
 function buildAdjacentReference(
-  posts: ArchivePost[],
+  archivePosts: ArchivePost[],
   currentPostIndex: number,
   offset: number,
 ): PostReference | null {
-  const targetPost = posts[currentPostIndex + offset]
+  const targetPost = archivePosts[currentPostIndex + offset]
 
   if (!targetPost) {
     return null
@@ -171,16 +119,16 @@ function countSharedTags(currentPost: ArchivePost, nextPost: ArchivePost): numbe
 
 /**
  * 生成详情页右侧和底部使用的相关文章列表。
- * 排序规则优先看标签重合度，其次保留原始列表顺序，保证结果既相关又稳定。
+ * 排序规则优先看标签重合度，其次保留统一文章源中的原始顺序，保证结果既相关又稳定。
  */
 function buildRelatedPosts(
-  posts: ArchivePost[],
+  archivePosts: ArchivePost[],
   currentPost: ArchivePost,
 ): PostReference[] {
   const scoredPosts: Array<{ post: ArchivePost; score: number; order: number }> = []
 
-  for (let index = 0; index < posts.length; index += 1) {
-    const post = posts[index]
+  for (let index = 0; index < archivePosts.length; index += 1) {
+    const post = archivePosts[index]
 
     if (post.slug === currentPost.slug) {
       continue
@@ -211,38 +159,38 @@ function buildRelatedPosts(
 }
 
 /**
- * 从本地静态内容中组装文章详情页数据。
- * 当前实现把“列表摘要”和“Markdown 正文”合并在 service 层，页面层就只负责渲染。
+ * 从统一 Markdown 内容源中组装文章详情页数据。
+ * 列表页与详情页现在共用同一批文章文档，service 层只负责把正文和导航关系拼装成页面需要的结构。
  */
 function getLocalPostDetailPageContent(slug: string): PostDetailPageData {
-  const currentPost = getArchivePostBySlug(slug)
-  const markdownContent =
-    getMarkdownContentBySlug(slug) ?? buildFallbackMarkdown(currentPost)
-  const currentPostIndex = postsArchivePageContent.posts.findIndex(
-    (post) => post.slug === slug,
+  const archivePosts = getAllArchivePosts()
+  const markdownPostDocument = getMarkdownPostDocumentBySlug(slug)
+
+  if (!markdownPostDocument) {
+    throw new Response('未找到对应文章。', {
+      status: 404,
+      statusText: '未找到对应文章。',
+    })
+  }
+
+  const currentPost = getArchivePostBySlug(archivePosts, slug)
+  const currentPostIndex = archivePosts.findIndex(
+    (archivePost) => archivePost.slug === slug,
   )
 
   return {
     post: currentPost,
-    markdownContent,
-    readingTimeText: getReadingTimeText(markdownContent),
-    previousPost: buildAdjacentReference(
-      postsArchivePageContent.posts,
-      currentPostIndex,
-      -1,
-    ),
-    nextPost: buildAdjacentReference(
-      postsArchivePageContent.posts,
-      currentPostIndex,
-      1,
-    ),
-    relatedPosts: buildRelatedPosts(postsArchivePageContent.posts, currentPost),
+    markdownContent: markdownPostDocument.markdownContent,
+    readingTimeText: getReadingTimeText(markdownPostDocument.markdownContent),
+    previousPost: buildAdjacentReference(archivePosts, currentPostIndex, -1),
+    nextPost: buildAdjacentReference(archivePosts, currentPostIndex, 1),
+    relatedPosts: buildRelatedPosts(archivePosts, currentPost),
   }
 }
 
 /**
  * 获取文章详情页数据。
- * 默认优先走本地 Markdown 和静态摘要；当环境变量关闭时，再切换到真实接口。
+ * 默认优先走统一 Markdown 内容源；当环境变量关闭时，再切换到真实接口。
  */
 export async function getPostDetailPageContent(
   slug: string,
