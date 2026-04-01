@@ -1,8 +1,11 @@
+import { getPublicAssetUrl } from '@/lib/public-asset'
 import type { HomePageStaticContent } from '@/types/content'
 
 /**
  * 首页静态内容配置。
  * 这里保留页面固定文案和视觉信息；“最新动态”里的文章卡片会由统一文章内容源动态生成。
+ * 头像这类 public 静态资源必须通过 `getPublicAssetUrl` 处理，避免 GitHub Pages 子路径部署时
+ * 因为缺失仓库名前缀而出现资源 404。
  */
 export const homePageContent: HomePageStaticContent = {
   hero: {
@@ -12,7 +15,7 @@ export const homePageContent: HomePageStaticContent = {
     description:
       '在这里，代码与二次元灵魂共鸣。探索极客技术与萌系文化的奇妙边界。',
     avatar: {
-      src: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCBKa7nI5Rgrhq1RZ4Zkk-HedmseBgdo_LfWQHnv4p8jm5qQRQowRz2j43fpR-OUSfNeiIKawUfABc2mcVYy6LjOY1rBKKye0vl0PxGvkC114PYj3q5S5sHlTUSJeOZIeQda3h57CJrW4DaWfYSiKF2IgBFWCfprJXqUIh8mb54ienVjhQZHngh2tQF0BMioJgFALlk2RDQSvYyFaHHB2uhcthXheL-vMZpZqHH8nB2LoekFx33CQKjjx2j660u-DNJ9A6KiXdEpkiO',
+      src: getPublicAssetUrl('mp4/头像.mp4'),
       alt: '黑白漫画风格的技术博客头像插画',
     },
     actions: [
@@ -34,7 +37,7 @@ export const homePageContent: HomePageStaticContent = {
         icon: 'map-pin',
       },
     ],
-    quote: '“永不停止编程，直到世界变成 2D。”',
+    quote: '“永不停歇编程，直到世界变成 2D。”',
   },
   updates: {
     title: '最新动态 // UPDATES',

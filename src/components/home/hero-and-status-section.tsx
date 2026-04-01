@@ -1,7 +1,6 @@
 import type { ReactElement } from 'react'
 import { Link } from 'react-router-dom'
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { getSiteIcon } from '@/lib/site-icons'
@@ -18,8 +17,52 @@ interface HeroAndStatusSectionProps {
 }
 
 /**
+ * 判断首页头像资源是否为视频。
+ * 首页头像后续可能继续在图片与视频之间切换，因此这里先把资源类型判断独立出来，
+ * 避免在 JSX 模板里到处分散写后缀判断逻辑。
+ */
+function isVideoAvatarSource(source: string): boolean {
+  return source.toLowerCase().endsWith('.mp4')
+}
+
+/**
+ * 渲染首页 Hero 区的头像媒体。
+ * 这里统一兼容图片与视频两种资源，并固定使用 1:1 的方形容器与 `object-cover` 裁切策略，
+ * 这样即使素材从插画改成视频，也不会破坏首页 Hero 区当前既有的头像尺寸。
+ */
+function renderHeroAvatarMedia(hero: HeroSectionData): ReactElement {
+  if (isVideoAvatarSource(hero.avatar.src)) {
+    return (
+      <div className="aspect-square w-full overflow-hidden border-4 border-black bg-white">
+        <video
+          src={hero.avatar.src}
+          aria-label={hero.avatar.alt}
+          className="size-full object-cover grayscale contrast-125"
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="metadata"
+        />
+      </div>
+    )
+  }
+
+  return (
+    <div className="aspect-square w-full overflow-hidden border-4 border-black bg-white">
+      <img
+        src={hero.avatar.src}
+        alt={hero.avatar.alt}
+        className="size-full object-cover grayscale contrast-125"
+        loading="eager"
+      />
+    </div>
+  )
+}
+
+/**
  * 渲染 Hero 区域中的操作按钮。
- * 每个按钮都来自配置层，便于后续把跳转地址换成真实业务路由。
+ * 每个按钮都来自配置层，便于后续把跳转地址换成真实业务路由，而不用修改页面结构。
  */
 function renderHeroActions(actions: HeroAction[]): ReactElement[] {
   const elements: ReactElement[] = []
@@ -43,7 +86,7 @@ function renderHeroActions(actions: HeroAction[]): ReactElement[] {
 
 /**
  * 渲染右侧状态面板中的每一行状态。
- * 把每一行抽成函数，有助于未来在这里插入实时数据刷新或状态颜色。
+ * 这里继续沿用统一图标映射，避免状态配置层直接依赖具体图标组件。
  */
 function renderStatusItems(items: StatusItem[]): ReactElement[] {
   const elements: ReactElement[] = []
@@ -69,7 +112,7 @@ function renderStatusItems(items: StatusItem[]): ReactElement[] {
 
 /**
  * 渲染首页首屏和状态卡片。
- * 这一块负责承接最强视觉冲击，因此保留了速度线、手绘气泡和重墨线阴影这些核心风格。
+ * 这一块负责承接首页最强的视觉焦点，因此保留速度线、手绘气泡与重墨线边框这些核心视觉元素。
  */
 export function HeroAndStatusSection({
   hero,
@@ -77,22 +120,13 @@ export function HeroAndStatusSection({
 }: HeroAndStatusSectionProps): ReactElement {
   return (
     <section className="grid items-stretch gap-8 lg:grid-cols-[minmax(0,1.65fr)_minmax(320px,0.9fr)]">
-      <Card className="relative overflow-hidden border-4 border-black bg-white py-0 manga-panel">
+      <Card className="relative overflow-visible border-4 border-black bg-white py-0 manga-panel">
         <div className="manga-speed-lines absolute inset-0 opacity-70" />
         <CardContent className="relative z-10 flex flex-col gap-10 p-6 md:p-8 lg:flex-row lg:items-center">
           <div className="relative mx-auto w-full max-w-72 flex-none lg:mx-0">
             <div className="manga-halftone absolute -inset-3 text-black/15" />
-            <Avatar className="size-full border-4 border-black bg-white">
-              <AvatarImage
-                src={hero.avatar.src}
-                alt={hero.avatar.alt}
-                className="object-cover grayscale contrast-125"
-              />
-              <AvatarFallback className="font-heading text-2xl font-black">
-                KT
-              </AvatarFallback>
-            </Avatar>
-            <div className="absolute -right-6 top-4 border-4 border-black bg-white px-4 py-2 -rotate-3 manga-panel">
+            {renderHeroAvatarMedia(hero)}
+            <div className="absolute z-30 -right-6 -top-[59px] border-4 border-black bg-white px-4 py-2 -rotate-3 manga-panel">
               <span className="font-heading text-xl font-black tracking-[0.2em]">
                 {hero.speechBubble}
               </span>
@@ -110,7 +144,9 @@ export function HeroAndStatusSection({
             <p className="max-w-xl text-lg font-semibold leading-8 text-black/78">
               {hero.description}
             </p>
-            <div className="flex flex-wrap gap-4">{renderHeroActions(hero.actions)}</div>
+            <div className="flex flex-wrap gap-4">
+              {renderHeroActions(hero.actions)}
+            </div>
           </div>
         </CardContent>
         <span className="absolute bottom-4 right-4 text-3xl font-black">✦</span>

@@ -33,7 +33,8 @@ interface SiteHeaderProps {
 
 /**
  * 计算桌面端导航链接的样式。
- * 激活状态需要保留明确的下划线与更深的文字颜色，未激活状态则只保留轻一点的悬停反馈。
+ * 激活态保留更明确的下划线和文字强调，未激活态只保留轻量的 hover 反馈。
+ * 这样可以在当前站点偏漫画感的重边框风格下，依然让导航层级足够清楚。
  */
 function getDesktopNavigationLinkClassName({
   isActive,
@@ -48,7 +49,8 @@ function getDesktopNavigationLinkClassName({
 
 /**
  * 计算移动端导航链接的样式。
- * 抽屉菜单里的点击区域需要更大，因此这里继续保留整块可点击的按钮式处理。
+ * 抽屉菜单里的点击区域需要更大，因此这里继续保留整块按钮式的处理方式，
+ * 让移动端点击命中范围更稳定，不会出现过小文本难以点中的问题。
  */
 function getMobileNavigationLinkClassName({
   isActive,
@@ -61,7 +63,8 @@ function getMobileNavigationLinkClassName({
 
 /**
  * 渲染桌面端导航项。
- * 这里显式使用 for...of，便于后续继续插入埋点、权限判断或 A/B 配置，而不是把逻辑全部塞进 map 回调里。
+ * 这里显式使用 `for...of`，便于后续插入埋点、权限判断或实验逻辑，
+ * 而不是把所有逻辑都塞进 `map` 的回调函数里。
  */
 function renderDesktopNavigationItems(
   navigation: NavigationLink[],
@@ -85,7 +88,9 @@ function renderDesktopNavigationItems(
 
 /**
  * 渲染 Header 右侧快捷入口。
- * 快捷入口当前主要用于跳转首页锚点，因此这里保留 a 标签语义，再统一交给点击事件做路由内滚动处理。
+ * 这里使用 `Link` 而不是原生 `<a>`，目的是让 GitHub Pages 这种子路径部署
+ * 自动继承 React Router 的 basename，避免链接地址丢失 `/manga-blog` 这类前缀。
+ * 同时仍然保留 `onClick` 拦截能力，用于首页锚点的平滑滚动控制。
  */
 function renderQuickActionItems(
   actions: SiteQuickAction[],
@@ -107,13 +112,13 @@ function renderQuickActionItems(
         size="icon"
         className="size-11"
       >
-        <a
-          href={action.to}
+        <Link
+          to={action.to}
           aria-label={action.ariaLabel}
           onClick={(event) => onQuickActionClick(event, action)}
         >
           <Icon className="size-5" />
-        </a>
+        </Link>
       </Button>,
     )
   }
@@ -123,7 +128,8 @@ function renderQuickActionItems(
 
 /**
  * 渲染移动端抽屉中的导航项。
- * 这里用 SheetClose 包裹链接，确保用户点击后抽屉会立即关闭，不会出现路由跳转了但菜单还停留在界面的情况。
+ * 这里用 `SheetClose` 包裹链接，确保用户点击后抽屉会立刻关闭，
+ * 不会出现路由已经跳转了，但抽屉仍停留在页面上的割裂感。
  */
 function renderMobileNavigationItems(
   navigation: NavigationLink[],
@@ -145,7 +151,8 @@ function renderMobileNavigationItems(
 
 /**
  * 渲染站点顶部导航。
- * 这次顶部样式改成“半透明描图纸”方案：保持点阵背景能透出来，同时用轻模糊和白膜提升导航可读性。
+ * 顶部保留半透明描图纸风格，让点阵背景可以透出来，同时靠边框、模糊和层级
+ * 保持导航的可读性与容器感。这里同时承担站内导航与首页锚点入口的职责。
  */
 export function SiteHeader({ config }: SiteHeaderProps): ReactElement {
   const navigate = useNavigate()
@@ -153,7 +160,10 @@ export function SiteHeader({ config }: SiteHeaderProps): ReactElement {
 
   /**
    * 处理快捷入口点击事件。
-   * 如果当前就在首页，则直接平滑滚动到目标锚点；如果当前不在首页，则先记住目标，再导航回首页后继续滚动。
+   * 如果当前已经在首页，就直接在当前地址后面补上 hash 并执行平滑滚动；
+   * 这里显式复用浏览器当前的 pathname 和 search，确保 GitHub Pages 下真实地址
+   * 仍然保持 `/manga-blog/` 这样的子路径前缀，而不是被错误替换成域名根路径 `/`。
+   * 如果当前不在首页，则先把目标锚点暂存起来，再回到首页后继续滚动。
    */
   function handleQuickActionClick(
     event: MouseEvent<HTMLAnchorElement>,
@@ -168,7 +178,9 @@ export function SiteHeader({ config }: SiteHeaderProps): ReactElement {
     event.preventDefault()
 
     if (location.pathname === '/') {
-      window.history.replaceState(null, '', `/#${anchorTarget}`)
+      const nextUrl = `${window.location.pathname}${window.location.search}#${anchorTarget}`
+
+      window.history.replaceState(null, '', nextUrl)
       scrollToAnchorTarget(anchorTarget)
       return
     }

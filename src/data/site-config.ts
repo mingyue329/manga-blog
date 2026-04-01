@@ -6,7 +6,7 @@ import type { SiteConfig } from '@/types/content'
  */
 export const siteConfig: SiteConfig = {
   brand: {
-    primaryLabel: '萌极客',
+    primaryLabel: '望月集',
     secondaryLabel: 'KAWAIITECH',
   },
   navigation: [

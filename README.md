@@ -82,3 +82,23 @@ VITE_API_BASE_URL=/api
 - [代码阅读指南（2026-03-31）](D:\code\figma\docs\CODE_READING_GUIDE_2026-03-31.md)
 - [今日工作总结（2026-03-31）](D:\code\figma\docs\DAILY_SUMMARY_2026-03-31.md)
 - [工作日志](D:\code\figma\docs\WORK_LOG.md)
+
+## GitHub Pages 发布
+
+项目已经补好了本地自动化发布脚本，适合在 Windows + `pnpm` 环境下直接执行：
+
+```bash
+pnpm build:pages
+pnpm deploy:pages
+```
+
+说明：
+- `pnpm build:pages`：只做 GitHub Pages 专用构建，产物输出到 `.deploy-gh-pages`
+- `pnpm deploy:pages`：先构建，再把产物强制推送到远端 `gh-pages` 分支
+- 脚本会自动根据当前 GitHub 远端推导 Vite 的 `base` 路径
+- 当前仓库的预期预览地址是 `https://mingyue329.github.io/manga-blog/`
+
+首次启用 GitHub Pages 时，还需要到 GitHub 仓库的 `Settings > Pages` 中把 Source 设为 `Deploy from a branch`，分支选择 `gh-pages`，目录选择 `/ (root)`。
+## 新增文档
+
+- [今日工作总结（2026-04-02）](D:\code\figma\docs\DAILY_SUMMARY_2026-04-02.md)

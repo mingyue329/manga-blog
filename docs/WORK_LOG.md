@@ -21,6 +21,20 @@
 - `pnpm typecheck`
 - `pnpm build`
 - `pnpm lint`
+
+### GitHub Pages 自动化
+- 新增 `scripts/deploy-github-pages.ps1`，提供 GitHub Pages 的构建与发布自动化脚本。
+- 在 `package.json` 中补充 `pnpm build:pages` 和 `pnpm deploy:pages` 两个命令。
+- 使用独立输出目录 `.deploy-gh-pages`，避免和本地常规 `dist` 构建产物互相干扰。
+- 脚本会自动根据当前仓库远端推导 GitHub Pages 的 `base` 路径与预览链接，并补齐 `.nojekyll` 和 `404.html`。
+- 已执行一次 `pnpm build:pages` 与 `pnpm deploy:pages`，成功将当前静态产物推送到远端 `gh-pages` 分支。
+- 当前仓库的目标预览地址为 `https://mingyue329.github.io/manga-blog/`，若首次启用 GitHub Pages，还需要到仓库 `Settings > Pages` 中把 Source 设为 `gh-pages / root`。
+- 修正 GitHub Pages 下的前端路由基路径：为 React Router 补充 basename，并同步修复首页快捷锚点入口在子路径部署时丢失仓库名前缀的问题。
+- 重新执行 `pnpm deploy:pages` 发布修复版后，站点根地址已恢复为首页而不再直接命中站内 404。
+
+### 细节微调
+
+- 将首页 Hero 区 `Hello_World` 气泡标签继续上移 5px，并让 Hero 卡片改为 `overflow-visible`，使气泡可以自然越过卡片边界形成悬浮感。
 - 本地预览下检查了：
   - 首页可访问
   - `/about` 可访问
@@ -98,3 +112,20 @@
 1. 下一步可以继续补文章目录导航、系列聚合页或更细的封面裁剪策略。
 2. 如果后面准备接后台，可以直接围绕现在这套 frontmatter 字段设计接口。
 3. 文章数量变多后，可以继续补目录导航、文章系列和代码高亮增强。
+## 2026-04-02
+
+### 本次完成
+
+- 把 `dist/mp4/头像.mp4` 复制到可维护的静态资源目录 `public/mp4/头像.mp4`。
+- 调整首页 Hero 头像渲染逻辑，让首页头像同时兼容图片与 mp4 视频资源。
+- 将首页头像资源改为 `public/mp4/头像.mp4`，并继续保持首页当前的 1:1 方形头像尺寸与裁切方式。
+
+### 已验证
+
+- `pnpm typecheck`
+- `pnpm build`
+- `pnpm lint`
+### 资源路径与总结文档
+- 修复首页头像视频在 GitHub Pages 上的资源路径问题：不再直接使用 `/mp4/头像.mp4`，而是改为通过 `import.meta.env.BASE_URL` 自动拼接仓库子路径。
+- 新增 `src/lib/public-asset.ts`，后续 public 目录静态资源都可以复用这个方法生成部署安全的访问地址。
+- 新增今日总结文档 `docs/DAILY_SUMMARY_2026-04-02.md`，整理了 GitHub Pages 构建原理、脚本职责、部署链路和今天的任务结果。
