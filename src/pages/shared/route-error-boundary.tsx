@@ -1,13 +1,12 @@
 import type { ReactElement } from 'react'
 import { isRouteErrorResponse, Link, useRouteError } from 'react-router-dom'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/shared/ui/badge'
+import { Button } from '@/shared/ui/button'
+import { Card, CardContent } from '@/shared/ui/card'
 
 /**
  * 生成更可读的错误标题。
- * 路由错误可能来自网络、loader 或普通运行时异常，因此这里按不同类型做统一翻译。
  */
 function getRouteErrorTitle(error: unknown): string {
   if (isRouteErrorResponse(error)) {
@@ -34,7 +33,7 @@ function getRouteErrorDescription(error: unknown): string {
 
 /**
  * 路由级错误边界。
- * 当 loader 或页面渲染抛错时，这个组件会负责兜底展示错误信息。
+ * 当 loader 或页面渲染抛错时，这里统一负责展示错误信息。
  */
 export function RouteErrorBoundary(): ReactElement {
   const routeError = useRouteError()

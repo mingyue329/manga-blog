@@ -1,0 +1,114 @@
+﻿import type { ReactElement } from 'react'
+import { BarChart3, GitBranchPlus } from 'lucide-react'
+
+import { Card, CardContent } from '@/shared/ui/card'
+import { Progress } from '@/shared/ui/progress'
+import { getSiteIcon } from '@/shared/lib/site-icons'
+import { cn } from '@/shared/lib/utils'
+import type { AboutSkillNode, AboutStatItem } from '@/shared/types/content'
+
+interface AboutStatsSkillsSectionProps {
+  statsTitle: string
+  stats: AboutStatItem[]
+  skillsTitle: string
+  skills: AboutSkillNode[]
+}
+
+/**
+ * 娓叉煋鑳藉姏鏉″垪琛ㄣ€? * 閫氳繃鐙珛鍑芥暟鎶婃暟鍊兼潯鏍峰紡缁熶竴璧锋潵锛屽悗缁鏋滄帴鍏ュ疄鏃舵暟鎹紝鍙渶瑕佹浛鎹㈡暟鎹簮鍗冲彲銆? */
+function renderAboutStats(stats: AboutStatItem[]): ReactElement[] {
+  const elements: ReactElement[] = []
+
+  for (const stat of stats) {
+    elements.push(
+      <div key={stat.label} className="space-y-3">
+        <div className="flex items-center justify-between gap-4 text-sm font-black uppercase tracking-[0.18em]">
+          <span>
+            {stat.label} / {stat.secondaryLabel}
+          </span>
+          <span>{stat.valueText}</span>
+        </div>
+        <Progress
+          value={stat.value}
+          className="h-6 border-2 border-black bg-white p-0.5 [&>[data-slot=progress-indicator]]:manga-halftone"
+        />
+      </div>,
+    )
+  }
+
+  return elements
+}
+
+/**
+ * 娓叉煋鎶€鑳芥爲鍙跺瓙鑺傜偣銆? */
+function renderSkillNodes(skills: AboutSkillNode[]): ReactElement[] {
+  const elements: ReactElement[] = []
+
+  for (const skill of skills) {
+    const Icon = getSiteIcon(skill.icon)
+
+    elements.push(
+      <div key={skill.title} className="flex flex-col items-center">
+        <div className="mb-4 h-1 w-full bg-black" />
+        <div
+          className={cn(
+            'flex aspect-square w-full flex-col items-center justify-center border-4 border-black p-3 text-center transition-all',
+            skill.emphasized
+              ? 'manga-halftone bg-black text-white'
+              : 'bg-secondary hover:bg-black hover:text-white',
+          )}
+        >
+          <Icon className="mb-3 size-8" />
+          <span className="text-sm font-black">{skill.title}</span>
+          <span className="mt-2 text-xs font-medium leading-5 opacity-75">
+            {skill.description}
+          </span>
+        </div>
+      </div>,
+    )
+  }
+
+  return elements
+}
+
+/**
+ * 娓叉煋鍏充簬椤典腑鐨勮兘鍔涢潰鏉垮拰鎶€鑳芥爲銆? */
+export function AboutStatsSkillsSection({
+  statsTitle,
+  stats,
+  skillsTitle,
+  skills,
+}: AboutStatsSkillsSectionProps): ReactElement {
+  return (
+    <section id="stats" className="scroll-mt-32 grid gap-8 xl:grid-cols-2">
+      <Card className="relative overflow-hidden border-4 border-black bg-white py-0 manga-panel">
+        <div className="manga-halftone absolute right-0 top-0 size-24 text-black/10" />
+        <CardContent className="space-y-8 p-8">
+          <h3 className="flex items-center gap-3 font-heading text-3xl font-black tracking-tight">
+            <BarChart3 className="size-7" />
+            {statsTitle}
+          </h3>
+          <div className="space-y-8">{renderAboutStats(stats)}</div>
+        </CardContent>
+      </Card>
+
+      <Card className="border-4 border-black bg-white py-0 manga-panel-reverse">
+        <CardContent className="space-y-8 p-8">
+          <h3 className="flex items-center gap-3 font-heading text-3xl font-black tracking-tight">
+            <GitBranchPlus className="size-7" />
+            {skillsTitle}
+          </h3>
+          <div className="flex flex-col items-center py-4">
+            <div className="z-10 border-4 border-black bg-black px-6 py-4 text-center font-heading text-sm font-black text-white">
+              鏍稿績寮€鍙?            </div>
+            <div className="h-12 w-1 bg-black" />
+            <div className="grid w-full gap-4 md:grid-cols-3">
+              {renderSkillNodes(skills)}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </section>
+  )
+}
+

@@ -9,8 +9,6 @@ lerna-debug.log*
 
 node_modules
 dist
-.deploy-gh-pages
-dist-check
 dist-ssr
 *.local
 
