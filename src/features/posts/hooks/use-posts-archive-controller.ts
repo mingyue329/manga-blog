@@ -9,6 +9,7 @@ interface UsePostsArchiveControllerOptions {
   posts: ArchivePost[]
   tags: string[]
   pageSize: number
+  rankedSearchSlugs?: string[] | null
 }
 
 /**
@@ -80,6 +81,26 @@ function matchesTagFilter(post: ArchivePost, activeTag: string): boolean {
   return post.tags.includes(activeTag)
 }
 
+function buildRankedSearchPosts(
+  posts: ArchivePost[],
+  rankedSearchSlugs: string[],
+): ArchivePost[] {
+  const postMap = new Map(posts.map((post) => [post.slug, post]))
+  const rankedPosts: ArchivePost[] = []
+
+  for (const slug of rankedSearchSlugs) {
+    const matchedPost = postMap.get(slug)
+
+    if (!matchedPost) {
+      continue
+    }
+
+    rankedPosts.push(matchedPost)
+  }
+
+  return rankedPosts
+}
+
 /**
  * 根据搜索词和标签筛选文章。
  */
@@ -87,11 +108,16 @@ function filterArchivePosts(
   posts: ArchivePost[],
   keyword: string,
   activeTag: string,
+  rankedSearchSlugs: string[] | null,
 ): ArchivePost[] {
   const filteredPosts: ArchivePost[] = []
+  const searchScopedPosts =
+    keyword && rankedSearchSlugs !== null
+      ? buildRankedSearchPosts(posts, rankedSearchSlugs)
+      : posts
 
-  for (const post of posts) {
-    if (!matchesSearchKeyword(post, keyword)) {
+  for (const post of searchScopedPosts) {
+    if (keyword && rankedSearchSlugs === null && !matchesSearchKeyword(post, keyword)) {
       continue
     }
 
@@ -180,12 +206,18 @@ export function usePostsArchiveController({
   posts,
   tags,
   pageSize,
+  rankedSearchSlugs = null,
 }: UsePostsArchiveControllerOptions) {
   const [searchParams, setSearchParams] = useSearchParams()
   const searchKeyword = normalizeSearchKeyword(searchParams.get('q'))
   const activeTag = normalizeTagFilter(searchParams.get('tag'), tags)
   const requestedPage = parsePageNumber(searchParams.get('page'))
-  const filteredPosts = filterArchivePosts(posts, searchKeyword, activeTag)
+  const filteredPosts = filterArchivePosts(
+    posts,
+    searchKeyword,
+    activeTag,
+    rankedSearchSlugs,
+  )
   const totalPages = Math.max(1, Math.ceil(filteredPosts.length / pageSize))
   const currentPage = clampPageNumber(requestedPage, totalPages)
   const visiblePosts = slicePostsByPage(filteredPosts, currentPage, pageSize)

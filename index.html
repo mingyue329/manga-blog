@@ -1,10 +1,63 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/x-icon" href="%SITE_FAVICON_URL%" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>%SITE_TITLE%</title>
+    <script>
+      ;(() => {
+        const THEME_STORAGE_KEY = 'kawaiitech-theme'
+        const PAPER_TONE_STORAGE_KEY = 'kawaiitech-paper-tone'
+        const INK_TONE_STORAGE_KEY = 'kawaiitech-ink-tone'
+        const paperToneOptions = [
+          '#fbf8ef',
+          '#f8f7f4',
+          '#f3eee2',
+          '#ecefe8',
+          '#e8edf3',
+          '#efe7df',
+        ]
+        const inkToneOptions = [
+          '#111111',
+          '#1a1a1a',
+          '#1b2430',
+          '#20271d',
+          '#2a231d',
+          '#171a24',
+        ]
+
+        const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY)
+        const storedPaperTone = Number.parseInt(
+          window.localStorage.getItem(PAPER_TONE_STORAGE_KEY) ?? '1',
+          10,
+        )
+        const storedInkTone = Number.parseInt(
+          window.localStorage.getItem(INK_TONE_STORAGE_KEY) ?? '0',
+          10,
+        )
+        const paperToneIndex = Math.min(
+          Math.max(Number.isFinite(storedPaperTone) ? storedPaperTone : 1, 0),
+          paperToneOptions.length - 1,
+        )
+        const inkToneIndex = Math.min(
+          Math.max(Number.isFinite(storedInkTone) ? storedInkTone : 0, 0),
+          inkToneOptions.length - 1,
+        )
+
+        document.documentElement.classList.toggle('dark', storedTheme === 'dark')
+        document.documentElement.dataset.theme =
+          storedTheme === 'dark' ? 'dark' : 'light'
+        document.documentElement.style.setProperty(
+          '--theme-paper-base',
+          paperToneOptions[paperToneIndex],
+        )
+        document.documentElement.style.setProperty(
+          '--theme-ink-base',
+          inkToneOptions[inkToneIndex],
+        )
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

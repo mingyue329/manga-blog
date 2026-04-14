@@ -3,6 +3,7 @@ import { ArrowRight, Sparkles, Stars } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 import { getPostCoverRatioClass } from '@/shared/lib/post-cover-ratio'
+import { useGsapHoverPreviewCard } from '@/shared/lib/use-gsap-hover-preview-card'
 import { cn } from '@/shared/lib/utils'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
@@ -24,21 +25,21 @@ interface PostsArchiveListProps {
 function renderArchiveHeader(resultCount: number): ReactElement {
   return (
     <header className="relative mb-12">
-      <h1 className="mb-4 font-heading text-6xl font-black uppercase italic leading-none tracking-tight md:text-8xl">
+      <h1 className="mb-4 font-heading text-5xl font-black uppercase italic leading-none tracking-tight md:text-7xl">
         文章归档
         <br />
-        <span className="mt-2 inline-block bg-black px-4 py-1 text-2xl not-italic text-white md:text-4xl">
+        <span className="theme-surface-ink mt-2 inline-block px-4 py-1 text-2xl not-italic md:text-4xl">
           ARCHIVE.2024
         </span>
       </h1>
-      <div className="absolute right-0 top-0 hidden text-black/18 md:block">
+      <div className="theme-text-faint absolute right-0 top-0 hidden md:block">
         <div className="mb-2 flex gap-1">
           <Stars className="size-8" />
           <Sparkles className="size-8" />
         </div>
-        <div className="h-1 w-48 bg-black" />
+        <div className="theme-surface-ink h-1 w-48" />
       </div>
-      <p className="text-sm font-bold uppercase tracking-[0.18em] text-black/55">
+      <p className="theme-text-muted text-sm font-bold uppercase tracking-[0.18em]">
         {`当前结果：${resultCount} 篇`}
       </p>
     </header>
@@ -50,7 +51,7 @@ function renderArchiveHeader(resultCount: number): ReactElement {
  */
 function renderPostMetaLine(post: ArchivePost): ReactElement {
   return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-black uppercase tracking-[0.16em] text-black/48">
+    <div className="theme-text-muted flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-black uppercase tracking-[0.16em]">
       <span>By {post.author}</span>
       <span>Cover {post.coverRatio}</span>
       <span>{post.series ? `Series ${post.series}` : 'Series 单篇文章'}</span>
@@ -58,36 +59,53 @@ function renderPostMetaLine(post: ArchivePost): ReactElement {
   )
 }
 
-/**
- * 渲染单篇文章卡片。
- */
-function renderArchivePostCard(
-  post: ArchivePost,
-  onOpenPreview: (post: ArchivePost) => void,
-): ReactElement {
+function ArchivePostCard({
+  post,
+  onOpenPreview,
+}: {
+  post: ArchivePost
+  onOpenPreview: (post: ArchivePost) => void
+}): ReactElement {
+  const { triggerRef, cardRef, shadowRef, imageRef, overlayRef } =
+    useGsapHoverPreviewCard()
+
   return (
-    <article
-      key={post.slug}
-      className="group relative flex flex-col gap-8 md:flex-row md:items-start"
-    >
-      <Card
+    <article className="group relative flex flex-col gap-8 md:flex-row md:items-start">
+      <div
+        ref={triggerRef}
         className={cn(
-          'w-full shrink-0 overflow-hidden border-4 border-black bg-white py-0 transition-all duration-300 group-hover:shadow-[12px_12px_0_0_#111111] md:w-80',
+          'relative w-full shrink-0 md:w-80',
           post.imageSide === 'right' ? 'md:order-last' : '',
         )}
       >
-        <CardContent
-          className={cn('relative p-0', getPostCoverRatioClass(post.coverRatio))}
+        <div
+          ref={shadowRef}
+          className="pointer-events-none absolute inset-0 z-0 theme-surface-ink theme-border-strong border-4"
+        />
+        <Card
+          ref={cardRef}
+          className="manga-panel-hover theme-surface-panel theme-border-strong relative z-10 w-full overflow-hidden border-4 py-0"
         >
-          <img
-            src={post.image.src}
-            alt={post.image.alt}
-            className="h-full w-full object-cover"
-            loading="lazy"
-          />
-          <div className="manga-halftone absolute inset-0 opacity-15 transition-opacity group-hover:opacity-5" />
-        </CardContent>
-      </Card>
+          <CardContent
+            className={cn(
+              'manga-preview-media p-0',
+              getPostCoverRatioClass(post.coverRatio),
+            )}
+          >
+            <div
+              ref={overlayRef}
+              className="pointer-events-none absolute inset-0 bg-[var(--preview-image-overlay)]"
+            />
+            <img
+              ref={imageRef}
+              src={post.image.src}
+              alt={post.image.alt}
+              className="h-full w-full object-cover"
+              loading="lazy"
+            />
+          </CardContent>
+        </Card>
+      </div>
 
       <div className="flex-1 pt-2">
         <div className="mb-4 flex flex-wrap items-center gap-3">
@@ -95,16 +113,16 @@ function renderArchivePostCard(
           <Badge variant="outlineInk">{post.categoryLabel}</Badge>
           {post.featured ? <Badge variant="outlineInk">推荐</Badge> : null}
         </div>
-        <h2 className="mb-4 font-heading text-3xl font-black tracking-tight transition-transform group-hover:translate-x-1 md:text-4xl">
+        <h2 className="mb-4 font-heading text-3xl font-black tracking-tight md:text-4xl">
           {post.title}
         </h2>
-        <p className="mb-6 text-lg leading-8 text-black/70">{post.excerpt}</p>
+        <p className="theme-text-soft mb-6 text-lg leading-8">{post.excerpt}</p>
         <div className="mb-5">{renderPostMetaLine(post)}</div>
         <div className="flex flex-wrap gap-3">
           {post.tags.map((tag) => (
             <span
               key={`${post.slug}-${tag}`}
-              className="text-xs font-black uppercase tracking-[0.16em] text-black/40"
+              className="theme-text-faint text-xs font-black uppercase tracking-[0.16em]"
             >
               #{tag}
             </span>
@@ -142,7 +160,13 @@ function renderArchivePostCards(
   const elements: ReactElement[] = []
 
   for (const post of posts) {
-    elements.push(renderArchivePostCard(post, onOpenPreview))
+    elements.push(
+      <ArchivePostCard
+        key={post.slug}
+        post={post}
+        onOpenPreview={onOpenPreview}
+      />,
+    )
   }
 
   return elements
@@ -199,11 +223,11 @@ function renderPagination(
  */
 function renderEmptyState(): ReactElement {
   return (
-    <Card className="border-4 border-black bg-white py-0 manga-panel">
+    <Card className="theme-surface-panel theme-border-strong border-4 py-0 manga-panel">
       <CardContent className="space-y-4 p-8">
         <Badge variant="ink">EMPTY</Badge>
         <h2 className="font-heading text-3xl font-black">没有找到匹配的文章</h2>
-        <p className="max-w-2xl text-base leading-8 text-black/70">
+        <p className="theme-text-soft max-w-2xl text-base leading-8">
           可以尝试清空搜索词，或者切换其他标签。这里保留了后续接入真实内容源和排序能力的空间。
         </p>
       </CardContent>
@@ -229,9 +253,9 @@ export function PostsArchiveList({
       {posts.length > 0 ? (
         <div className="relative space-y-16">
           <div className="pointer-events-none absolute -left-20 top-28 hidden xl:block">
-            <div className="mb-4 h-0.5 w-32 bg-black/30" />
-            <div className="mb-4 h-0.5 w-48 bg-black/30" />
-            <div className="mb-4 h-0.5 w-24 bg-black/30" />
+            <div className="mb-4 h-0.5 w-32 bg-[var(--line-soft)]" />
+            <div className="mb-4 h-0.5 w-48 bg-[var(--line-soft)]" />
+            <div className="mb-4 h-0.5 w-24 bg-[var(--line-soft)]" />
           </div>
           {renderArchivePostCards(posts, onOpenPreview)}
         </div>

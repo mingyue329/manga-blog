@@ -1,21 +1,17 @@
-﻿import type { ReactElement } from 'react'
-import { useState } from 'react'
-import { useLoaderData } from 'react-router-dom'
+import { useEffect, useState, type ReactElement } from 'react'
+import { useLoaderData, useSearchParams } from 'react-router-dom'
 
 import { PostPreviewSheet } from '@/features/posts/components/post-preview-sheet'
 import { PostsArchiveList } from '@/features/posts/components/posts-archive-list'
 import { PostsSidebar } from '@/features/posts/components/posts-sidebar'
+import { usePagefindPostSearch } from '@/features/posts/hooks/use-pagefind-post-search'
 import { usePostsArchiveController } from '@/features/posts/hooks/use-posts-archive-controller'
 import type { ArchivePost, PostsArchivePageData } from '@/shared/types/content'
 
-/**
- * 璇诲彇鏂囩珷褰掓。椤甸鍔犺浇鏁版嵁銆? */
 function usePostsArchivePageData(): PostsArchivePageData {
   return useLoaderData() as PostsArchivePageData
 }
 
-/**
- * 鏍规嵁褰撳墠閫変腑鐨?slug 鏌ユ壘鏂囩珷銆? * 淇濇寔杩欏眰鏌ユ壘閫昏緫鍗曠嫭瀛樺湪锛屽彲浠ヨ椤甸潰鐘舵€佸拰鍐呭鏁版嵁瑙ｈ€︺€? */
 function getSelectedPost(
   posts: ArchivePost[],
   selectedPostSlug: string | null,
@@ -33,31 +29,45 @@ function getSelectedPost(
   return null
 }
 
-/**
- * 鏂囩珷褰掓。椤甸〉闈㈢粍浠躲€? */
 export function PostsPage(): ReactElement {
   const pageData = usePostsArchivePageData()
+  const [searchParams] = useSearchParams()
   const [selectedPostSlug, setSelectedPostSlug] = useState<string | null>(null)
+  const [previewOpen, setPreviewOpen] = useState(false)
+  const searchKeyword = searchParams.get('q')?.trim() ?? ''
+  const pagefindSearch = usePagefindPostSearch(searchKeyword)
   const controller = usePostsArchiveController({
     posts: pageData.posts,
     tags: pageData.tags,
     pageSize: pageData.pageSize,
+    rankedSearchSlugs: pagefindSearch.isUsingPagefind
+      ? pagefindSearch.matchedPostSlugs
+      : null,
   })
   const selectedPost = getSelectedPost(pageData.posts, selectedPostSlug)
 
-  /**
-   * 鎵撳紑鏂囩珷棰勮鎶藉眽銆?   */
   function openPostPreview(post: ArchivePost): void {
     setSelectedPostSlug(post.slug)
+    setPreviewOpen(true)
   }
 
-  /**
-   * 澶勭悊棰勮鎶藉眽寮€鍏炽€?   * 褰撴娊灞夊叧闂椂锛岄『鎵嬫竻绌哄綋鍓嶉€変腑鐨勬枃绔狅紝閬垮厤涓嬫鎵撳紑鏃剁姸鎬佹贩涔便€?   */
   function handlePreviewSheetOpenChange(nextOpen: boolean): void {
-    if (!nextOpen) {
-      setSelectedPostSlug(null)
-    }
+    setPreviewOpen(nextOpen)
   }
+
+  useEffect(() => {
+    if (previewOpen || !selectedPostSlug) {
+      return
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setSelectedPostSlug(null)
+    }, 260)
+
+    return () => {
+      window.clearTimeout(timeoutId)
+    }
+  }, [previewOpen, selectedPostSlug])
 
   return (
     <>
@@ -73,6 +83,9 @@ export function PostsPage(): ReactElement {
           hallOfFameMembers={pageData.hallOfFameMembers}
           onSearchKeywordChange={controller.updateSearchKeyword}
           onTagChange={controller.updateActiveTag}
+          pagefindSearchResults={pagefindSearch.results}
+          pagefindSearchMode={pagefindSearch.mode}
+          pagefindSearchErrorMessage={pagefindSearch.errorMessage}
         />
         <PostsArchiveList
           posts={controller.visiblePosts}
@@ -85,10 +98,9 @@ export function PostsPage(): ReactElement {
       </div>
       <PostPreviewSheet
         post={selectedPost}
-        open={selectedPost !== null}
+        open={previewOpen}
         onOpenChange={handlePreviewSheetOpenChange}
       />
     </>
   )
 }
-

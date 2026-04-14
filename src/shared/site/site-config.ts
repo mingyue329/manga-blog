@@ -30,7 +30,7 @@ export const siteConfig: SiteConfig = {
   ],
   footer: {
     links: [
-      { label: 'RSS Feed', to: '/posts' },
+      { label: 'RSS Feed', to: '/rss.xml' },
       { label: 'GitHub', to: '/about' },
       { label: 'Privacy', to: '/about' },
     ],

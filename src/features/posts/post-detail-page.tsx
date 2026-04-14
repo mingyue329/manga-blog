@@ -13,6 +13,7 @@ import { Link, useLoaderData } from 'react-router-dom'
 
 import { PostMarkdown } from '@/features/posts/components/post-markdown'
 import { getPostCoverRatioClass } from '@/shared/lib/post-cover-ratio'
+import { useGsapHoverPreviewCard } from '@/shared/lib/use-gsap-hover-preview-card'
 import { cn } from '@/shared/lib/utils'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
@@ -65,13 +66,13 @@ function renderArticleMetaItems(metaItems: ArticleMetaItem[]): ReactElement[] {
     elements.push(
       <div
         key={`${metaItem.label}-${metaItem.value}`}
-        className="flex items-center gap-3 border-2 border-black bg-white px-4 py-3"
+        className="theme-surface-panel theme-border-strong flex items-center gap-3 border-2 px-4 py-3"
       >
-        <span className="flex size-10 items-center justify-center border-2 border-black bg-secondary">
+        <span className="theme-surface-panel-muted theme-border-strong flex size-10 items-center justify-center border-2">
           <Icon className="size-4" />
         </span>
         <div className="space-y-1">
-          <p className="text-[0.68rem] font-black uppercase tracking-[0.2em] text-black/48">
+          <p className="theme-text-muted text-[0.68rem] font-black uppercase tracking-[0.2em]">
             {metaItem.label}
           </p>
           <p className="font-heading text-sm font-black uppercase tracking-[0.14em]">
@@ -97,12 +98,12 @@ function renderStorySeedItems(post: ArchivePost): ReactElement[] {
     elements.push(
       <li
         key={`${post.slug}-${previewSection.heading}`}
-        className="flex gap-3 border-b-2 border-black/12 pb-3 last:border-b-0 last:pb-0"
+        className="theme-border-faint flex gap-3 border-b-2 pb-3 last:border-b-0 last:pb-0"
       >
-        <span className="font-heading text-sm font-black uppercase tracking-[0.18em] text-black/45">
+        <span className="theme-text-faint font-heading text-sm font-black uppercase tracking-[0.18em]">
           {String(index + 1).padStart(2, '0')}
         </span>
-        <span className="font-medium leading-7 text-black/72">
+        <span className="theme-text-soft font-medium leading-7">
           {previewSection.heading}
         </span>
       </li>,
@@ -123,7 +124,7 @@ function renderArticleSummaryLine(post: ArchivePost): ReactElement {
   ]
 
   return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm font-black uppercase tracking-[0.16em] text-black/48">
+    <div className="theme-text-muted flex flex-wrap items-center gap-x-4 gap-y-2 text-sm font-black uppercase tracking-[0.16em]">
       {summaryParts.map((summaryPart) => (
         <span key={summaryPart}>{summaryPart}</span>
       ))}
@@ -146,9 +147,9 @@ function renderArticleFactItems(post: ArchivePost): ReactElement[] {
   return factItems.map((factItem) => (
     <div
       key={`${factItem.label}-${factItem.value}`}
-      className="border-2 border-black bg-white px-4 py-3"
+      className="theme-surface-panel theme-border-strong border-2 px-4 py-3"
     >
-      <p className="text-[0.68rem] font-black uppercase tracking-[0.2em] text-black/48">
+      <p className="theme-text-muted text-[0.68rem] font-black uppercase tracking-[0.2em]">
         {factItem.label}
       </p>
       <p className="mt-2 font-heading text-sm font-black uppercase tracking-[0.14em]">
@@ -158,36 +159,99 @@ function renderArticleFactItems(post: ArchivePost): ReactElement[] {
   ))
 }
 
-/**
- * 渲染上一篇或下一篇导航卡片。
- */
-function renderPostNavigationCard(
-  label: string,
-  postReference: PostReference | null,
-  direction: 'previous' | 'next',
-): ReactElement | null {
+function PostNavigationCard({
+  label,
+  postReference,
+  direction,
+}: {
+  label: string
+  postReference: PostReference
+  direction: 'previous' | 'next'
+}): ReactElement {
+  const { triggerRef, cardRef } = useGsapHoverPreviewCard()
   if (!postReference) {
-    return null
+    throw new Error('PostNavigationCard requires a post reference.')
   }
 
   const DirectionIcon = direction === 'previous' ? ArrowLeft : ArrowRight
 
   return (
-    <Link to={postReference.to} className="group block h-full">
-      <Card className="h-full border-4 border-black bg-white py-0 transition-transform duration-200 group-hover:-translate-y-1 group-hover:shadow-[10px_10px_0_0_#111111]">
+    <Link ref={triggerRef} to={postReference.to} className="group block h-full">
+      <Card
+        ref={cardRef}
+        className="manga-panel-hover theme-surface-panel theme-border-strong h-full border-4 py-0"
+      >
         <CardContent className="space-y-4 p-6">
           <div className="flex items-center justify-between gap-4">
             <Badge variant="outlineInk">{label}</Badge>
-            <DirectionIcon className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
+            <DirectionIcon className="size-4" />
           </div>
           <h3 className="font-heading text-2xl font-black leading-tight tracking-tight">
             {postReference.title}
           </h3>
-          <p className="line-clamp-3 text-sm leading-7 text-black/68">
+          <p className="theme-text-soft line-clamp-3 text-sm leading-7">
             {postReference.excerpt}
           </p>
         </CardContent>
       </Card>
+    </Link>
+  )
+}
+
+function RelatedPostCard({ relatedPost }: { relatedPost: PostReference }): ReactElement {
+  const { triggerRef, cardRef, shadowRef, imageRef, overlayRef } =
+    useGsapHoverPreviewCard()
+
+  return (
+    <Link ref={triggerRef} to={relatedPost.to} className="group block h-full">
+      <div className="relative h-full">
+        <div
+          ref={shadowRef}
+          className="pointer-events-none absolute inset-0 z-0 theme-surface-ink theme-border-strong border-4"
+        />
+        <Card
+          ref={cardRef}
+          className="manga-panel-hover theme-surface-panel theme-border-strong relative z-10 h-full overflow-hidden border-4 py-0"
+        >
+          <CardContent className="p-0">
+            <div
+              className={cn(
+                'manga-preview-media theme-border-strong border-b-4',
+                getPostCoverRatioClass(relatedPost.coverRatio),
+              )}
+            >
+              <div
+                ref={overlayRef}
+                className="pointer-events-none absolute inset-0 bg-[var(--preview-image-overlay)]"
+              />
+              <img
+                ref={imageRef}
+                src={relatedPost.image.src}
+                alt={relatedPost.image.alt}
+                className="h-full w-full object-cover"
+                loading="lazy"
+              />
+            </div>
+            <div className="space-y-4 p-6">
+              <div className="flex flex-wrap items-center gap-3">
+                <Badge variant="ink">{relatedPost.categoryLabel}</Badge>
+                {relatedPost.series ? (
+                  <Badge variant="outlineInk">{relatedPost.series}</Badge>
+                ) : null}
+                <span className="theme-text-faint text-xs font-black uppercase tracking-[0.18em]">
+                  {relatedPost.date}
+                </span>
+              </div>
+              <h3 className="font-heading text-2xl font-black leading-tight tracking-tight">
+                {relatedPost.title}
+              </h3>
+              <p className="theme-text-soft line-clamp-3 text-sm leading-7">
+                {relatedPost.excerpt}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </Link>
   )
 }
@@ -199,45 +263,7 @@ function renderRelatedPostCards(relatedPosts: PostReference[]): ReactElement[] {
   const elements: ReactElement[] = []
 
   for (const relatedPost of relatedPosts) {
-    elements.push(
-      <Link key={relatedPost.slug} to={relatedPost.to} className="group block h-full">
-        <Card className="h-full overflow-hidden border-4 border-black bg-white py-0 transition-transform duration-200 group-hover:-translate-y-1 group-hover:shadow-[10px_10px_0_0_#111111]">
-          <CardContent className="p-0">
-            <div
-              className={cn(
-                'relative overflow-hidden border-b-4 border-black',
-                getPostCoverRatioClass(relatedPost.coverRatio),
-              )}
-            >
-              <img
-                src={relatedPost.image.src}
-                alt={relatedPost.image.alt}
-                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                loading="lazy"
-              />
-              <div className="manga-halftone absolute inset-0 opacity-12" />
-            </div>
-            <div className="space-y-4 p-6">
-              <div className="flex flex-wrap items-center gap-3">
-                <Badge variant="ink">{relatedPost.categoryLabel}</Badge>
-                {relatedPost.series ? (
-                  <Badge variant="outlineInk">{relatedPost.series}</Badge>
-                ) : null}
-                <span className="text-xs font-black uppercase tracking-[0.18em] text-black/42">
-                  {relatedPost.date}
-                </span>
-              </div>
-              <h3 className="font-heading text-2xl font-black leading-tight tracking-tight">
-                {relatedPost.title}
-              </h3>
-              <p className="line-clamp-3 text-sm leading-7 text-black/68">
-                {relatedPost.excerpt}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </Link>,
-    )
+    elements.push(<RelatedPostCard key={relatedPost.slug} relatedPost={relatedPost} />)
   }
 
   return elements
@@ -268,20 +294,26 @@ export function PostDetailPage(): ReactElement {
 
   return (
     <div className="space-y-16 md:space-y-20">
-      <header className="relative space-y-8">
-        <div className="absolute -left-8 -top-8 hidden size-20 border-4 border-black/18 bg-black/4 xl:block" />
+      <header className="relative space-y-8 pt-4 xl:pt-6">
+        <div
+          className="theme-border-faint absolute -left-8 top-0 hidden size-20 border-4 xl:block"
+          style={{
+            backgroundColor:
+              'color-mix(in srgb, var(--line-faint) 48%, transparent)',
+          }}
+        />
         <div className="space-y-4">
-          <p className="manga-label text-black/52">Article Detail // Markdown</p>
+          <p className="manga-label theme-text-muted">Article Detail // Markdown</p>
           <div className="flex flex-wrap items-center gap-3">
             <Badge variant="ink">{pageData.post.categoryLabel}</Badge>
             <Badge variant="outlineInk">{pageData.readingTimeText}</Badge>
           </div>
         </div>
         <div className="max-w-5xl space-y-5">
-          <h1 className="font-heading text-5xl font-black leading-none tracking-tight md:text-7xl">
+          <h1 className="font-heading text-4xl font-black leading-none tracking-tight md:text-6xl xl:text-7xl">
             {pageData.post.title}
           </h1>
-          <p className="max-w-3xl text-lg leading-8 text-black/72 md:text-xl">
+          <p className="theme-text-soft max-w-3xl text-lg leading-8 md:text-xl">
             {pageData.post.excerpt}
           </p>
           {renderArticleSummaryLine(pageData.post)}
@@ -292,11 +324,11 @@ export function PostDetailPage(): ReactElement {
       </header>
 
       <section className="space-y-8">
-        <Card className="overflow-hidden border-4 border-black bg-white py-0 manga-panel">
+        <Card className="theme-surface-panel theme-border-strong overflow-hidden border-4 py-0 manga-panel">
           <CardContent className="grid gap-0 p-0 lg:grid-cols-[minmax(0,1.4fr)_320px]">
             <div
               className={cn(
-                'relative overflow-hidden border-b-4 border-black lg:aspect-auto lg:border-r-4 lg:border-b-0',
+                'theme-border-strong relative overflow-hidden border-b-4 lg:aspect-auto lg:border-r-4 lg:border-b-0',
                 getPostCoverRatioClass(pageData.post.coverRatio),
               )}
             >
@@ -305,18 +337,17 @@ export function PostDetailPage(): ReactElement {
                 alt={pageData.post.image.alt}
                 className="h-full w-full object-cover"
               />
-              <div className="manga-halftone absolute inset-0 opacity-12" />
-              <div className="absolute right-5 top-5 border-4 border-black bg-white px-4 py-2 font-heading text-sm font-black uppercase tracking-[0.18em]">
+              <div className="theme-surface-panel theme-border-strong absolute right-5 top-5 border-4 px-4 py-2 font-heading text-sm font-black uppercase tracking-[0.18em]">
                 Detail Panel
               </div>
             </div>
             <div className="space-y-6 p-6 md:p-8">
               <div className="space-y-3">
-                <p className="manga-label text-black/45">Story Seeds</p>
+                <p className="manga-label theme-text-faint">Story Seeds</p>
                 <h2 className="font-heading text-3xl font-black tracking-tight">
                   本章线索
                 </h2>
-                <p className="text-sm leading-7 text-black/68">
+                <p className="theme-text-soft text-sm leading-7">
                   这里延续归档页里的分节信息，让读者先知道文章会聊什么，再进入下面的 Markdown 正文。
                 </p>
               </div>
@@ -324,8 +355,8 @@ export function PostDetailPage(): ReactElement {
               <div className="grid gap-3 sm:grid-cols-2">
                 {renderArticleFactItems(pageData.post)}
               </div>
-              <div className="border-4 border-black bg-secondary px-5 py-4">
-                <p className="text-sm font-bold leading-7 text-black/80">
+              <div className="theme-surface-panel-muted theme-border-strong border-4 px-5 py-4">
+                <p className="theme-text-strong text-sm font-bold leading-7">
                   “详情页延续全站的黑白漫画科技风，但把阅读节奏放在第一位，让图像、信息卡片和正文各自承担明确职责。”
                 </p>
               </div>
@@ -336,9 +367,9 @@ export function PostDetailPage(): ReactElement {
 
       <section className="grid gap-10 xl:grid-cols-[minmax(0,1fr)_300px]">
         <div className="space-y-10">
-          <Card className="mx-auto w-full max-w-3xl border-4 border-black bg-white py-0 manga-panel">
-            <CardContent className="space-y-8 p-8 md:p-12">
-              <div className="flex items-center gap-3 border-b-4 border-black pb-4">
+          <Card className="theme-surface-panel theme-border-strong w-full border-4 py-0 manga-panel">
+            <CardContent className="space-y-6 p-8 md:p-10">
+              <div className="theme-border-strong flex items-center gap-3 border-b-4 pb-4">
                 <Sparkles className="size-5" />
                 <p className="font-heading text-xl font-black uppercase tracking-[0.12em]">
                   Markdown Manuscript
@@ -349,13 +380,25 @@ export function PostDetailPage(): ReactElement {
           </Card>
 
           <div className="grid gap-6 md:grid-cols-2">
-            {renderPostNavigationCard('上一篇', pageData.previousPost, 'previous')}
-            {renderPostNavigationCard('下一篇', pageData.nextPost, 'next')}
+            {pageData.previousPost ? (
+              <PostNavigationCard
+                label="上一篇"
+                postReference={pageData.previousPost}
+                direction="previous"
+              />
+            ) : null}
+            {pageData.nextPost ? (
+              <PostNavigationCard
+                label="下一篇"
+                postReference={pageData.nextPost}
+                direction="next"
+              />
+            ) : null}
           </div>
         </div>
 
         <aside className="space-y-6 xl:sticky xl:top-32 xl:self-start">
-          <Card className="border-4 border-black bg-white py-0">
+          <Card className="theme-surface-panel theme-border-strong border-4 py-0">
             <CardContent className="space-y-5 p-6">
               <div className="flex items-center gap-3">
                 <Tags className="size-4" />
@@ -369,7 +412,7 @@ export function PostDetailPage(): ReactElement {
             </CardContent>
           </Card>
 
-          <Card className="border-4 border-black bg-white py-0">
+          <Card className="theme-surface-panel theme-border-strong border-4 py-0">
             <CardContent className="space-y-5 p-6">
               <p className="font-heading text-xl font-black uppercase tracking-[0.14em]">
                 阅读动作
@@ -395,10 +438,10 @@ export function PostDetailPage(): ReactElement {
         </aside>
       </section>
 
-      <section className="space-y-8 border-t-8 border-black pt-10">
+      <section className="theme-border-strong space-y-8 border-t-8 pt-10">
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div className="space-y-2">
-            <p className="manga-label text-black/48">Next Panels</p>
+            <p className="manga-label theme-text-muted">Next Panels</p>
             <h2 className="font-heading text-4xl font-black tracking-tight">
               相关文章
             </h2>

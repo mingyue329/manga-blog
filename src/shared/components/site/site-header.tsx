@@ -1,13 +1,28 @@
-﻿import type { MouseEvent, ReactElement } from 'react'
-import { Menu } from 'lucide-react'
 import {
-  Link,
-  NavLink,
-  type NavLinkRenderProps,
-  useLocation,
-  useNavigate,
-} from 'react-router-dom'
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type MouseEvent,
+  type ReactElement,
+} from 'react'
+import { Menu, MoonStar, Palette, RotateCcw, SunMedium } from 'lucide-react'
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 
+import {
+  extractAnchorTarget,
+  savePendingAnchorTarget,
+  scrollToAnchorTarget,
+} from '@/shared/lib/anchor-scroll'
+import { getSiteIcon } from '@/shared/lib/site-icons'
+import { cn } from '@/shared/lib/utils'
+import { useTheme } from '@/shared/site/theme-provider'
+import type {
+  NavigationLink,
+  SiteConfig,
+  SiteQuickAction,
+} from '@/shared/types/content'
 import { Button } from '@/shared/ui/button'
 import {
   Sheet,
@@ -18,56 +33,43 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/shared/ui/sheet'
-import {
-  extractAnchorTarget,
-  savePendingAnchorTarget,
-  scrollToAnchorTarget,
-} from '@/shared/lib/anchor-scroll'
-import { getSiteIcon } from '@/shared/lib/site-icons'
-import { cn } from '@/shared/lib/utils'
-import type { NavigationLink, SiteConfig, SiteQuickAction } from '@/shared/types/content'
 
 interface SiteHeaderProps {
   config: SiteConfig
 }
 
-/**
- * 璁＄畻妗岄潰绔鑸摼鎺ョ殑鏍峰紡銆? * 婵€娲绘€佷繚鐣欐洿鏄庣‘鐨勪笅鍒掔嚎鍜屾枃瀛楀己璋冿紝鏈縺娲绘€佸彧淇濈暀杞婚噺鐨?hover 鍙嶉銆? * 杩欐牱鍙互鍦ㄥ綋鍓嶇珯鐐瑰亸婕敾鎰熺殑閲嶈竟妗嗛鏍间笅锛屼緷鐒惰瀵艰埅灞傜骇瓒冲娓呮銆? */
-function getDesktopNavigationLinkClassName({
-  isActive,
-}: NavLinkRenderProps): string {
-  return cn(
-    'relative px-1 pb-2 font-heading text-sm font-black uppercase tracking-[0.24em] transition-all',
-    isActive
-      ? 'text-black after:absolute after:bottom-0 after:left-0 after:h-1 after:w-full after:bg-black'
-      : 'text-black/65 hover:text-black hover:skew-x-[-8deg]',
-  )
+function isDesktopNavigationItemActive(
+  currentPathname: string,
+  itemTo: string,
+): boolean {
+  if (itemTo === '/') {
+    return currentPathname === '/'
+  }
+
+  return currentPathname === itemTo || currentPathname.startsWith(`${itemTo}/`)
 }
 
-/**
- * 璁＄畻绉诲姩绔鑸摼鎺ョ殑鏍峰紡銆? * 鎶藉眽鑿滃崟閲岀殑鐐瑰嚮鍖哄煙闇€瑕佹洿澶э紝鍥犳杩欓噷缁х画淇濈暀鏁村潡鎸夐挳寮忕殑澶勭悊鏂瑰紡锛? * 璁╃Щ鍔ㄧ鐐瑰嚮鍛戒腑鑼冨洿鏇寸ǔ瀹氾紝涓嶄細鍑虹幇杩囧皬鏂囨湰闅句互鐐逛腑鐨勯棶棰樸€? */
-function getMobileNavigationLinkClassName({
-  isActive,
-}: NavLinkRenderProps): string {
-  return cn(
-    'block border-b-2 border-black px-4 py-4 font-heading text-lg font-black uppercase tracking-[0.2em] transition-colors',
-    isActive ? 'bg-black text-white' : 'bg-white text-black hover:bg-secondary',
-  )
-}
-
-/**
- * 娓叉煋妗岄潰绔鑸」銆? * 杩欓噷鏄惧紡浣跨敤 `for...of`锛屼究浜庡悗缁彃鍏ュ煁鐐广€佹潈闄愬垽鏂垨瀹為獙閫昏緫锛? * 鑰屼笉鏄妸鎵€鏈夐€昏緫閮藉杩?`map` 鐨勫洖璋冨嚱鏁伴噷銆? */
 function renderDesktopNavigationItems(
   navigation: NavigationLink[],
+  currentPathname: string,
+  setItemRef: (to: string, element: HTMLAnchorElement | null) => void,
 ): ReactElement[] {
   const elements: ReactElement[] = []
 
   for (const item of navigation) {
+    const isActive = isDesktopNavigationItemActive(currentPathname, item.to)
+
     elements.push(
       <NavLink
         key={item.to}
         to={item.to}
-        className={getDesktopNavigationLinkClassName}
+        ref={(element) => setItemRef(item.to, element)}
+        className={cn(
+          'relative px-1 pb-2 font-heading text-base font-black uppercase tracking-[0.18em] transition-[transform,opacity] duration-300',
+          isActive
+            ? 'theme-text-strong opacity-100'
+            : 'theme-text-soft opacity-100 hover:opacity-100 hover:skew-x-[-8deg]',
+        )}
       >
         {item.label}
       </NavLink>,
@@ -77,8 +79,38 @@ function renderDesktopNavigationItems(
   return elements
 }
 
-/**
- * 娓叉煋 Header 鍙充晶蹇嵎鍏ュ彛銆? * 杩欓噷浣跨敤 `Link` 鑰屼笉鏄師鐢?`<a>`锛岀洰鐨勬槸璁?GitHub Pages 杩欑瀛愯矾寰勯儴缃? * 鑷姩缁ф壙 React Router 鐨?basename锛岄伩鍏嶉摼鎺ュ湴鍧€涓㈠け `/manga-blog` 杩欑被鍓嶇紑銆? * 鍚屾椂浠嶇劧淇濈暀 `onClick` 鎷︽埅鑳藉姏锛岀敤浜庨椤甸敋鐐圭殑骞虫粦婊氬姩鎺у埗銆? */
+function buildThemeSliderTrack(colors: readonly string[]): string {
+  if (colors.length === 1) {
+    return colors[0]
+  }
+
+  return `linear-gradient(90deg, ${colors
+    .map(
+      (color, index) =>
+        `${color} ${(index / (colors.length - 1)) * 100}%`,
+    )
+    .join(', ')})`
+}
+
+function getThemeSliderStyle(track: string): CSSProperties {
+  return {
+    ['--theme-slider-track' as '--theme-slider-track']: track,
+  }
+}
+
+function getMobileNavigationLinkClassName({
+  isActive,
+}: {
+  isActive: boolean
+}): string {
+  return cn(
+    'block border-b-2 px-4 py-4 font-heading text-lg font-black uppercase tracking-[0.2em] transition-colors theme-border',
+    isActive
+      ? 'theme-ink-surface'
+      : 'theme-paper-surface hover:bg-secondary',
+  )
+}
+
 function renderQuickActionItems(
   actions: SiteQuickAction[],
   onQuickActionClick: (
@@ -113,9 +145,6 @@ function renderQuickActionItems(
   return elements
 }
 
-/**
- * 娓叉煋绉诲姩绔娊灞変腑鐨勫鑸」銆? * 杩欓噷鐢?`SheetClose` 鍖呰９閾炬帴锛岀‘淇濈敤鎴风偣鍑诲悗鎶藉眽浼氱珛鍒诲叧闂紝
- * 涓嶄細鍑虹幇璺敱宸茬粡璺宠浆浜嗭紝浣嗘娊灞変粛鍋滅暀鍦ㄩ〉闈笂鐨勫壊瑁傛劅銆? */
 function renderMobileNavigationItems(
   navigation: NavigationLink[],
 ): ReactElement[] {
@@ -124,7 +153,10 @@ function renderMobileNavigationItems(
   for (const item of navigation) {
     elements.push(
       <SheetClose key={item.to} asChild>
-        <NavLink to={item.to} className={getMobileNavigationLinkClassName}>
+        <NavLink
+          to={item.to}
+          className={({ isActive }) => getMobileNavigationLinkClassName({ isActive })}
+        >
           {item.label}
         </NavLink>
       </SheetClose>,
@@ -134,17 +166,106 @@ function renderMobileNavigationItems(
   return elements
 }
 
-/**
- * 娓叉煋绔欑偣椤堕儴瀵艰埅銆? * 椤堕儴淇濈暀鍗婇€忔槑鎻忓浘绾搁鏍硷紝璁╃偣闃佃儗鏅彲浠ラ€忓嚭鏉ワ紝鍚屾椂闈犺竟妗嗐€佹ā绯婂拰灞傜骇
- * 淇濇寔瀵艰埅鐨勫彲璇绘€т笌瀹瑰櫒鎰熴€傝繖閲屽悓鏃舵壙鎷呯珯鍐呭鑸笌棣栭〉閿氱偣鍏ュ彛鐨勮亴璐ｃ€? */
 export function SiteHeader({ config }: SiteHeaderProps): ReactElement {
   const navigate = useNavigate()
   const location = useLocation()
+  const {
+    theme,
+    paperToneIndex,
+    inkToneIndex,
+    paperToneLabel,
+    inkToneLabel,
+    paperToneOptions,
+    inkToneOptions,
+    paperColor,
+    inkColor,
+    toggleTheme,
+    setPaperToneIndex,
+    setInkToneIndex,
+    resetThemeColors,
+  } = useTheme()
+  const [isPaletteOpen, setIsPaletteOpen] = useState(false)
+  const navigationRef = useRef<HTMLDivElement | null>(null)
+  const navigationIndicatorRef = useRef<HTMLDivElement | null>(null)
+  const navigationItemRefs = useRef<Record<string, HTMLAnchorElement | null>>({})
+  const palettePanelRef = useRef<HTMLDivElement | null>(null)
 
-  /**
-   * 澶勭悊蹇嵎鍏ュ彛鐐瑰嚮浜嬩欢銆?   * 濡傛灉褰撳墠宸茬粡鍦ㄩ椤碉紝灏辩洿鎺ュ湪褰撳墠鍦板潃鍚庨潰琛ヤ笂 hash 骞舵墽琛屽钩婊戞粴鍔紱
-   * 杩欓噷鏄惧紡澶嶇敤娴忚鍣ㄥ綋鍓嶇殑 pathname 鍜?search锛岀‘淇?GitHub Pages 涓嬬湡瀹炲湴鍧€
-   * 浠嶇劧淇濇寔 `/manga-blog/` 杩欐牱鐨勫瓙璺緞鍓嶇紑锛岃€屼笉鏄閿欒鏇挎崲鎴愬煙鍚嶆牴璺緞 `/`銆?   * 濡傛灉褰撳墠涓嶅湪棣栭〉锛屽垯鍏堟妸鐩爣閿氱偣鏆傚瓨璧锋潵锛屽啀鍥炲埌棣栭〉鍚庣户缁粴鍔ㄣ€?   */
+  function setNavigationItemRef(
+    to: string,
+    element: HTMLAnchorElement | null,
+  ): void {
+    navigationItemRefs.current[to] = element
+  }
+
+  useLayoutEffect(() => {
+    const navigationElement = navigationRef.current
+    const indicatorElement = navigationIndicatorRef.current
+
+    if (!navigationElement || !indicatorElement) {
+      return
+    }
+
+    const activeItem = config.navigation.find((item) =>
+      isDesktopNavigationItemActive(location.pathname, item.to),
+    )
+
+    if (!activeItem) {
+      indicatorElement.style.opacity = '0'
+      return
+    }
+
+    const activeElement = navigationItemRefs.current[activeItem.to]
+
+    if (!activeElement) {
+      indicatorElement.style.opacity = '0'
+      return
+    }
+
+    const navigationRect = navigationElement.getBoundingClientRect()
+    const activeRect = activeElement.getBoundingClientRect()
+
+    indicatorElement.style.opacity = '1'
+    indicatorElement.style.width = `${activeRect.width}px`
+    indicatorElement.style.transform = `translateX(${activeRect.left - navigationRect.left}px)`
+  }, [config.navigation, location.pathname])
+
+  useEffect(() => {
+    const indicatorElement = navigationIndicatorRef.current
+
+    if (!indicatorElement) {
+      return
+    }
+
+    indicatorElement.style.transition =
+      'transform 280ms cubic-bezier(0.22, 1, 0.36, 1), width 280ms cubic-bezier(0.22, 1, 0.36, 1), opacity 180ms ease-out'
+  }, [])
+
+  useEffect(() => {
+    if (!isPaletteOpen) {
+      return
+    }
+
+    function handlePointerDown(event: PointerEvent): void {
+      const palettePanelElement = palettePanelRef.current
+
+      if (!palettePanelElement) {
+        return
+      }
+
+      if (palettePanelElement.contains(event.target as Node)) {
+        return
+      }
+
+      setIsPaletteOpen(false)
+    }
+
+    window.addEventListener('pointerdown', handlePointerDown)
+
+    return () => {
+      window.removeEventListener('pointerdown', handlePointerDown)
+    }
+  }, [isPaletteOpen])
+
   function handleQuickActionClick(
     event: MouseEvent<HTMLAnchorElement>,
     action: SiteQuickAction,
@@ -175,16 +296,157 @@ export function SiteHeader({ config }: SiteHeaderProps): ReactElement {
         <div className="site-tracing-header flex min-h-20 items-center justify-between gap-4 px-4 py-4 md:px-6">
           <Link
             to="/"
-            className="-rotate-1 whitespace-nowrap border-4 border-black bg-white/88 px-3 py-1 font-heading text-base leading-none font-black uppercase tracking-tight shadow-[4px_4px_0_0_rgba(17,17,17,0.08)] transition-transform hover:-translate-y-0.5 sm:text-lg md:text-xl"
+            className="-rotate-1 whitespace-nowrap px-3 py-1 font-heading text-base leading-none font-black uppercase tracking-tight transition-transform hover:-translate-y-0.5 sm:text-lg md:text-xl"
+            style={{
+              border: '4px solid var(--line-strong)',
+              backgroundColor:
+                'color-mix(in srgb, var(--surface-panel) 88%, transparent)',
+              color: 'var(--copy-strong)',
+              boxShadow:
+                '4px 4px 0 0 color-mix(in srgb, var(--surface-ink) 8%, transparent)',
+            }}
           >
             {config.brand.primaryLabel} // {config.brand.secondaryLabel}
           </Link>
 
-          <nav className="hidden items-center gap-8 md:flex">
-            {renderDesktopNavigationItems(config.navigation)}
-          </nav>
+          <div ref={navigationRef} className="relative hidden items-center gap-8 md:flex">
+            {renderDesktopNavigationItems(
+              config.navigation,
+              location.pathname,
+              setNavigationItemRef,
+            )}
+            <div
+              ref={navigationIndicatorRef}
+              className="pointer-events-none absolute bottom-0 left-0 h-1 bg-[var(--surface-ink)] opacity-0"
+            />
+          </div>
 
-          <div className="flex items-center gap-3">
+          <div className="relative flex items-center gap-3">
+            <Button
+              type="button"
+              variant="iconInk"
+              size="icon"
+              className="size-11"
+              aria-label={theme === 'light' ? '切换到夜间模式' : '切换到日间模式'}
+              onClick={toggleTheme}
+            >
+              {theme === 'light' ? (
+                <MoonStar className="size-5" />
+              ) : (
+                <SunMedium className="size-5" />
+              )}
+            </Button>
+
+            <div ref={palettePanelRef} className="relative">
+              <Button
+                type="button"
+                variant="iconInk"
+                size="icon"
+                className="size-11"
+                aria-label="打开主题配色面板"
+                onClick={() => setIsPaletteOpen((open) => !open)}
+              >
+                <Palette className="size-5" />
+              </Button>
+
+              {isPaletteOpen ? (
+                <div className="theme-surface-panel theme-border-strong absolute right-0 top-[calc(100%+12px)] z-50 w-80 space-y-5 border-4 p-4 shadow-[8px_8px_0_0_var(--surface-ink)]">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="space-y-1">
+                      <p className="font-heading text-sm font-black uppercase tracking-[0.18em]">
+                        Theme Tone
+                      </p>
+                      <p className="theme-text-soft text-xs leading-5">
+                        改成受控色阶后，首页和文章区会整站同步，避免颜色偏到不协调的方向。
+                      </p>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outlineInk"
+                      size="icon-xs"
+                      aria-label="重置主题色阶"
+                      onClick={resetThemeColors}
+                    >
+                      <RotateCcw className="size-3.5" />
+                    </Button>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <p className="font-heading text-xs font-black uppercase tracking-[0.16em]">
+                          Paper Tone
+                        </p>
+                        <p className="theme-text-muted text-xs">{paperToneLabel}</p>
+                      </div>
+                      <div className="theme-surface-panel-muted theme-border-soft min-w-14 border-2 px-3 py-2 text-center font-heading text-xs font-black uppercase tracking-[0.12em]">
+                        {paperToneIndex}
+                      </div>
+                    </div>
+                    <input
+                      type="range"
+                      min={0}
+                      max={paperToneOptions.length - 1}
+                      step={1}
+                      value={paperToneIndex}
+                      aria-label="调整纸面色阶"
+                      onChange={(event) =>
+                        setPaperToneIndex(Number.parseInt(event.target.value, 10))
+                      }
+                      className="theme-slider"
+                      style={getThemeSliderStyle(
+                        buildThemeSliderTrack(
+                          paperToneOptions.map((option) => option.value),
+                        ),
+                      )}
+                    />
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <p className="font-heading text-xs font-black uppercase tracking-[0.16em]">
+                          Ink Tone
+                        </p>
+                        <p className="theme-text-muted text-xs">{inkToneLabel}</p>
+                      </div>
+                      <div className="theme-surface-panel-muted theme-border-soft min-w-14 border-2 px-3 py-2 text-center font-heading text-xs font-black uppercase tracking-[0.12em]">
+                        {inkToneIndex}
+                      </div>
+                    </div>
+                    <input
+                      type="range"
+                      min={0}
+                      max={inkToneOptions.length - 1}
+                      step={1}
+                      value={inkToneIndex}
+                      aria-label="调整墨色深度"
+                      onChange={(event) =>
+                        setInkToneIndex(Number.parseInt(event.target.value, 10))
+                      }
+                      className="theme-slider"
+                      style={getThemeSliderStyle(
+                        buildThemeSliderTrack(
+                          inkToneOptions.map((option) => option.value),
+                        ),
+                      )}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div
+                      className="theme-border-soft h-12 border-2"
+                      style={{ backgroundColor: paperColor }}
+                    />
+                    <div
+                      className="theme-border-soft h-12 border-2"
+                      style={{ backgroundColor: inkColor }}
+                    />
+                  </div>
+                </div>
+              ) : null}
+            </div>
+
             {renderQuickActionItems(config.quickActions, handleQuickActionClick)}
 
             <Sheet>
@@ -193,21 +455,22 @@ export function SiteHeader({ config }: SiteHeaderProps): ReactElement {
                   variant="iconInk"
                   size="icon"
                   className="size-11 md:hidden"
-                  aria-label="鎵撳紑绔欑偣瀵艰埅"
+                  aria-label="打开站点导航"
                 >
                   <Menu className="size-5" />
                 </Button>
               </SheetTrigger>
               <SheetContent
                 side="right"
-                className="border-l-4 border-black bg-white p-0"
+                className="theme-paper-surface theme-border p-0"
               >
-                <SheetHeader className="border-b-4 border-black bg-secondary px-4 py-5">
+                <SheetHeader className="theme-secondary-surface theme-border border-b-4 px-4 py-5">
                   <SheetTitle className="font-heading text-2xl font-black uppercase tracking-tight">
-                    MENU // 瀵艰埅
+                    MENU // 导航
                   </SheetTitle>
-                  <SheetDescription className="text-sm text-black/70">
-                    杩欓噷淇濈暀浜嗗悗缁柊澧炴爮鐩€佺敤鎴蜂腑蹇冨拰鎼滅储鍏ュ彛鐨勬墿灞曠┖闂淬€?                  </SheetDescription>
+                  <SheetDescription className="theme-text-soft text-sm">
+                    这里保留了后续新增栏目、用户中心和搜索入口的扩展空间。
+                  </SheetDescription>
                 </SheetHeader>
                 <nav className="flex flex-col">
                   {renderMobileNavigationItems(config.navigation)}
@@ -220,4 +483,3 @@ export function SiteHeader({ config }: SiteHeaderProps): ReactElement {
     </header>
   )
 }
-

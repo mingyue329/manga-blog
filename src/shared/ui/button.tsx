@@ -1,29 +1,33 @@
-﻿import * as React from 'react'
+import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
+import { gsap } from 'gsap'
 import { Slot } from 'radix-ui'
 
 import { cn } from '@/shared/lib/utils'
 
-/**
- * 瀹氫箟鎸夐挳鐨勮瑙夊彉浣撱€? * 杩欓噷鍦?shadcn 榛樿鑳藉姏涓婂彔鍔犱簡椤圭洰鑷畾涔夌殑婕敾椋庢牸 variant锛屼笟鍔″眰鍙渶瑕佷紶璇箟鍖栫殑鍚嶅瓧鍗冲彲銆? */
 const buttonVariants = cva(
-  'inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap border-4 border-transparent font-heading text-sm font-black uppercase tracking-[0.12em] transition-[background-color,color,transform] duration-200 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*=size-])]:size-4',
+  'inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap border-4 border-transparent font-heading text-sm font-black uppercase tracking-[0.12em] transition-[background-color,color] duration-200 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*=size-])]:size-4',
   {
     variants: {
       variant: {
-        default: 'border-black bg-black text-white hover:-translate-y-0.5 hover:bg-white hover:text-black',
-        ink: 'border-black bg-black text-white hover:-translate-y-0.5 hover:bg-white hover:text-black',
+        default:
+          'border-[var(--line-strong)] bg-[var(--surface-ink)] text-[var(--copy-inverse)] hover:bg-[var(--surface-panel)] hover:text-[var(--copy-strong)]',
+        ink:
+          'border-[var(--line-strong)] bg-[var(--surface-ink)] text-[var(--copy-inverse)] hover:bg-[var(--surface-panel)] hover:text-[var(--copy-strong)]',
         outlineInk:
-          'border-black bg-white text-black hover:-translate-y-0.5 hover:bg-black hover:text-white',
+          'border-[var(--line-strong)] bg-[var(--surface-panel)] text-[var(--copy-strong)] hover:bg-[var(--surface-ink)] hover:text-[var(--copy-inverse)]',
         iconInk:
-          'border-black bg-white text-black hover:-translate-y-0.5 hover:bg-black hover:text-white',
+          'border-[var(--line-strong)] bg-[var(--surface-panel)] text-[var(--copy-strong)] hover:bg-[var(--surface-ink)] hover:text-[var(--copy-inverse)]',
         destructive:
           'border-destructive bg-destructive text-white hover:bg-destructive/90',
         outline:
-          'border-black bg-background text-black hover:bg-accent hover:text-accent-foreground',
-        secondary: 'border-black bg-secondary text-black hover:bg-white',
-        ghost: 'border-transparent bg-transparent text-black hover:bg-secondary',
-        link: 'border-transparent px-0 py-0 text-black underline-offset-4 hover:underline',
+          'border-[var(--line-strong)] bg-background text-[var(--copy-strong)] hover:bg-accent hover:text-accent-foreground',
+        secondary:
+          'border-[var(--line-strong)] bg-secondary text-[var(--secondary-foreground)] hover:bg-[var(--surface-panel)] hover:text-[var(--copy-strong)]',
+        ghost:
+          'border-transparent bg-transparent text-[var(--copy-strong)] hover:bg-secondary',
+        link:
+          'border-transparent px-0 py-0 text-[var(--copy-strong)] underline-offset-4 hover:underline',
       },
       size: {
         default: 'h-11 px-5 py-2 has-[>svg]:px-4',
@@ -43,22 +47,76 @@ const buttonVariants = cva(
   },
 )
 
-/**
- * 鎸夐挳缁勪欢銆? * 杩欎釜缁勪欢淇濈暀浜?shadcn 鐨?asChild 鏈哄埗锛屽洜姝ゆ棦鑳芥覆鏌?button锛屼篃鑳芥棤缂濇墭绠?Link 鎴?a 鏍囩銆? */
-function Button({
-  className,
-  variant = 'default',
-  size = 'default',
-  asChild = false,
-  ...props
-}: React.ComponentProps<'button'> &
-  VariantProps<typeof buttonVariants> & {
-    asChild?: boolean
-  }) {
+const Button = React.forwardRef<
+  HTMLElement,
+  React.ComponentProps<'button'> &
+    VariantProps<typeof buttonVariants> & {
+      asChild?: boolean
+    }
+>(({ className, variant = 'default', size = 'default', asChild = false, ...props }, forwardedRef) => {
   const Comp = asChild ? Slot.Root : 'button'
+  const internalRef = React.useRef<HTMLElement | null>(null)
+
+  React.useEffect(() => {
+    const element = internalRef.current
+
+    if (!element || variant === 'link') {
+      return
+    }
+
+    const prefersReducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches
+
+    gsap.set(element, {
+      y: 0,
+      boxShadow: '0px 0px 0px 0px var(--surface-ink)',
+    })
+
+    function handlePointerEnter(): void {
+      gsap.to(element, {
+        y: prefersReducedMotion ? 0 : -2,
+        boxShadow: '4px 4px 0px 0px var(--surface-ink)',
+        duration: prefersReducedMotion ? 0.01 : 0.2,
+        ease: prefersReducedMotion ? 'none' : 'power2.out',
+      })
+    }
+
+    function handlePointerLeave(): void {
+      gsap.to(element, {
+        y: 0,
+        boxShadow: '0px 0px 0px 0px var(--surface-ink)',
+        duration: prefersReducedMotion ? 0.01 : 0.18,
+        ease: prefersReducedMotion ? 'none' : 'power2.out',
+      })
+    }
+
+    element.addEventListener('pointerenter', handlePointerEnter)
+    element.addEventListener('pointerleave', handlePointerLeave)
+
+    return () => {
+      element.removeEventListener('pointerenter', handlePointerEnter)
+      element.removeEventListener('pointerleave', handlePointerLeave)
+      gsap.killTweensOf(element)
+    }
+  }, [variant])
+
+  function handleRef(node: HTMLElement | null): void {
+    internalRef.current = node
+
+    if (typeof forwardedRef === 'function') {
+      forwardedRef(node)
+      return
+    }
+
+    if (forwardedRef) {
+      forwardedRef.current = node
+    }
+  }
 
   return (
     <Comp
+      ref={handleRef}
       data-slot="button"
       data-variant={variant}
       data-size={size}
@@ -66,7 +124,8 @@ function Button({
       {...props}
     />
   )
-}
+})
+
+Button.displayName = 'Button'
 
 export { Button, buttonVariants }
-

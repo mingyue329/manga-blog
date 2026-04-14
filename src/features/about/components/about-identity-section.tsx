@@ -18,7 +18,7 @@ export function AboutIdentitySection({
   return (
     <section id="identity" className="scroll-mt-32 space-y-8">
       <header className="relative space-y-4">
-        <h1 className="-rotate-1 font-heading text-6xl font-black leading-none tracking-tight md:text-8xl">
+        <h1 className="-rotate-1 font-heading text-5xl font-black leading-none tracking-tight md:text-7xl">
           {pageData.pageTitle} //{' '}
           <span className="inline-block bg-black px-4 py-2 text-white">
             {pageData.pageTitleHighlight}

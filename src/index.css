@@ -10,33 +10,108 @@
   --radius-lg: 0rem;
   --radius-xl: 0rem;
 
-  --background: oklch(0.985 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.145 0 0);
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.93 0 0);
-  --secondary-foreground: oklch(0.145 0 0);
-  --muted: oklch(0.95 0 0);
-  --muted-foreground: oklch(0.45 0 0);
-  --accent: oklch(0.95 0 0);
-  --accent-foreground: oklch(0.145 0 0);
+  --theme-paper-base: #f8f7f4;
+  --theme-ink-base: #111111;
+
+  --paper: var(--theme-paper-base);
+  --ink: var(--theme-ink-base);
+  --surface-page: color-mix(in srgb, var(--paper) 96%, #ffffff 4%);
+  --surface-page-elevated: color-mix(in srgb, var(--paper) 92%, var(--ink) 8%);
+  --surface-panel: color-mix(in srgb, var(--paper) 98%, var(--ink) 2%);
+  --surface-panel-muted: color-mix(in srgb, var(--paper) 90%, var(--ink) 10%);
+  --surface-panel-strong: color-mix(in srgb, var(--paper) 84%, var(--ink) 16%);
+  --surface-ink: var(--ink);
+  --surface-ink-contrast: var(--paper);
+  --surface-header: color-mix(in srgb, var(--surface-panel) 82%, transparent);
+  --surface-header-gloss: color-mix(in srgb, var(--paper) 20%, transparent);
+
+  --copy-strong: var(--ink);
+  --copy-soft: color-mix(in srgb, var(--ink) 78%, var(--paper) 22%);
+  --copy-muted: color-mix(in srgb, var(--ink) 58%, var(--paper) 42%);
+  --copy-faint: color-mix(in srgb, var(--ink) 32%, var(--paper) 68%);
+  --copy-inverse: var(--paper);
+
+  --line-strong: color-mix(in srgb, var(--ink) 86%, var(--paper) 14%);
+  --line-soft: color-mix(in srgb, var(--ink) 28%, transparent);
+  --line-faint: color-mix(in srgb, var(--ink) 16%, transparent);
+  --line-accent: color-mix(in srgb, var(--ink) 52%, transparent);
+
+  --background: var(--surface-page);
+  --foreground: var(--copy-strong);
+  --card: var(--surface-panel);
+  --card-foreground: var(--copy-strong);
+  --popover: var(--surface-panel);
+  --popover-foreground: var(--copy-strong);
+  --primary: var(--surface-ink);
+  --primary-foreground: var(--copy-inverse);
+  --secondary: var(--surface-panel-muted);
+  --secondary-foreground: var(--copy-strong);
+  --muted: var(--surface-page-elevated);
+  --muted-foreground: var(--copy-muted);
+  --accent: var(--surface-panel-strong);
+  --accent-foreground: var(--copy-strong);
   --destructive: oklch(0.58 0.24 29.23);
   --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.18 0 0);
-  --input: oklch(0.92 0 0);
-  --ring: oklch(0.18 0 0);
+  --border: var(--line-strong);
+  --input: var(--surface-page-elevated);
+  --ring: var(--line-accent);
 
-  --paper: #f8f7f4;
-  --ink: #111111;
-  --ink-soft: #5c5c5c;
-  --panel-shadow: 10px 10px 0 0 #111111;
-  --panel-shadow-reverse: -10px 10px 0 0 #111111;
-  --halftone-dot: rgba(17, 17, 17, 0.18);
+  --ink-soft: color-mix(in srgb, var(--ink) 64%, var(--paper) 36%);
+  --panel-shadow: 10px 10px 0 0 var(--surface-ink);
+  --panel-shadow-reverse: -10px 10px 0 0 var(--surface-ink);
+  --halftone-dot: color-mix(in srgb, var(--ink) 18%, transparent);
+  --hero-speed-line: color-mix(in srgb, var(--ink) 14%, transparent);
+  --preview-image-filter: grayscale(1);
+  --preview-image-overlay: transparent;
   --site-max-width: 1480px;
+}
+
+.dark {
+  --paper: var(--theme-ink-base);
+  --ink: var(--theme-paper-base);
+  --surface-page: color-mix(in srgb, var(--paper) 96%, #000000 4%);
+  --surface-page-elevated: color-mix(in srgb, var(--paper) 90%, var(--ink) 10%);
+  --surface-panel: color-mix(in srgb, var(--paper) 88%, var(--ink) 12%);
+  --surface-panel-muted: color-mix(in srgb, var(--paper) 82%, var(--ink) 18%);
+  --surface-panel-strong: color-mix(in srgb, var(--paper) 76%, var(--ink) 24%);
+  --surface-ink: var(--ink);
+  --surface-ink-contrast: var(--paper);
+  --surface-header: color-mix(in srgb, var(--surface-panel) 80%, transparent);
+  --surface-header-gloss: color-mix(in srgb, var(--ink) 12%, transparent);
+
+  --copy-strong: var(--ink);
+  --copy-soft: color-mix(in srgb, var(--ink) 84%, var(--paper) 16%);
+  --copy-muted: color-mix(in srgb, var(--ink) 66%, var(--paper) 34%);
+  --copy-faint: color-mix(in srgb, var(--ink) 40%, var(--paper) 60%);
+  --copy-inverse: var(--paper);
+
+  --line-strong: color-mix(in srgb, var(--ink) 88%, var(--paper) 12%);
+  --line-soft: color-mix(in srgb, var(--ink) 26%, transparent);
+  --line-faint: color-mix(in srgb, var(--ink) 16%, transparent);
+  --line-accent: color-mix(in srgb, var(--ink) 54%, transparent);
+
+  --background: var(--surface-page);
+  --foreground: var(--copy-strong);
+  --card: var(--surface-panel);
+  --card-foreground: var(--copy-strong);
+  --popover: var(--surface-panel);
+  --popover-foreground: var(--copy-strong);
+  --primary: var(--surface-ink);
+  --primary-foreground: var(--copy-inverse);
+  --secondary: var(--surface-panel-muted);
+  --secondary-foreground: var(--copy-strong);
+  --muted: var(--surface-page-elevated);
+  --muted-foreground: var(--copy-muted);
+  --accent: var(--surface-panel-strong);
+  --accent-foreground: var(--copy-strong);
+  --border: var(--line-strong);
+  --input: var(--surface-page-elevated);
+  --ring: var(--line-accent);
+  --ink-soft: color-mix(in srgb, var(--ink) 72%, var(--paper) 28%);
+  --panel-shadow: 10px 10px 0 0 var(--surface-ink);
+  --panel-shadow-reverse: -10px 10px 0 0 var(--surface-ink);
+  --halftone-dot: color-mix(in srgb, var(--ink) 14%, transparent);
+  --hero-speed-line: color-mix(in srgb, var(--ink) 10%, transparent);
 }
 
 @theme inline {
@@ -80,7 +155,10 @@
     @apply bg-background font-sans text-foreground antialiased;
     min-height: 100vh;
     margin: 0;
-    background-color: var(--paper);
+    background-color: var(--surface-page);
+    transition:
+      background-color 260ms ease,
+      color 260ms ease;
   }
 
   a {
@@ -99,9 +177,217 @@
   #root {
     min-height: 100vh;
   }
+
+  .dark .interactive-dot-background {
+    --base-dot-color: rgba(244, 244, 244, 0.16);
+    --focus-dot-color: rgba(244, 244, 244, 0.76);
+  }
 }
 
 @layer utilities {
+  .border-black {
+    border-color: var(--line-strong) !important;
+  }
+
+  .bg-white {
+    background-color: var(--surface-panel) !important;
+  }
+
+  .bg-black {
+    background-color: var(--surface-ink) !important;
+  }
+
+  .text-black {
+    color: var(--copy-strong) !important;
+  }
+
+  .text-white {
+    color: var(--copy-inverse) !important;
+  }
+
+  .bg-white\/88 {
+    background-color: color-mix(in srgb, var(--paper) 88%, transparent) !important;
+  }
+
+  .bg-white\/10 {
+    background-color: color-mix(in srgb, var(--paper) 10%, transparent) !important;
+  }
+
+  .bg-black\/55 {
+    background-color: color-mix(in srgb, var(--ink) 55%, transparent) !important;
+  }
+
+  .bg-black\/20 {
+    background-color: color-mix(in srgb, var(--ink) 20%, transparent) !important;
+  }
+
+  .bg-black\/10 {
+    background-color: color-mix(in srgb, var(--ink) 10%, transparent) !important;
+  }
+
+  .bg-black\/6 {
+    background-color: color-mix(in srgb, var(--ink) 6%, transparent) !important;
+  }
+
+  .bg-black\/4 {
+    background-color: color-mix(in srgb, var(--ink) 4%, transparent) !important;
+  }
+
+  .bg-black\/3 {
+    background-color: color-mix(in srgb, var(--ink) 3%, transparent) !important;
+  }
+
+  .text-black\/80 {
+    color: color-mix(in srgb, var(--ink) 80%, transparent) !important;
+  }
+
+  .text-black\/78 {
+    color: color-mix(in srgb, var(--ink) 78%, transparent) !important;
+  }
+
+  .text-black\/72 {
+    color: color-mix(in srgb, var(--ink) 72%, transparent) !important;
+  }
+
+  .text-black\/70 {
+    color: color-mix(in srgb, var(--ink) 70%, transparent) !important;
+  }
+
+  .text-black\/68 {
+    color: color-mix(in srgb, var(--ink) 68%, transparent) !important;
+  }
+
+  .text-black\/65 {
+    color: color-mix(in srgb, var(--ink) 65%, transparent) !important;
+  }
+
+  .text-black\/60 {
+    color: color-mix(in srgb, var(--ink) 60%, transparent) !important;
+  }
+
+  .text-black\/55 {
+    color: color-mix(in srgb, var(--ink) 55%, transparent) !important;
+  }
+
+  .text-black\/52 {
+    color: color-mix(in srgb, var(--ink) 52%, transparent) !important;
+  }
+
+  .text-black\/48 {
+    color: color-mix(in srgb, var(--ink) 48%, transparent) !important;
+  }
+
+  .text-black\/45 {
+    color: color-mix(in srgb, var(--ink) 45%, transparent) !important;
+  }
+
+  .text-black\/42 {
+    color: color-mix(in srgb, var(--ink) 42%, transparent) !important;
+  }
+
+  .text-black\/40 {
+    color: color-mix(in srgb, var(--ink) 40%, transparent) !important;
+  }
+
+  .text-black\/18 {
+    color: color-mix(in srgb, var(--ink) 18%, transparent) !important;
+  }
+
+  .text-black\/12 {
+    color: color-mix(in srgb, var(--ink) 12%, transparent) !important;
+  }
+
+  .border-black\/30 {
+    border-color: color-mix(in srgb, var(--ink) 30%, transparent) !important;
+  }
+
+  .border-black\/26 {
+    border-color: color-mix(in srgb, var(--ink) 26%, transparent) !important;
+  }
+
+  .border-black\/24 {
+    border-color: color-mix(in srgb, var(--ink) 24%, transparent) !important;
+  }
+
+  .border-black\/18 {
+    border-color: color-mix(in srgb, var(--ink) 18%, transparent) !important;
+  }
+
+  .border-black\/12 {
+    border-color: color-mix(in srgb, var(--ink) 12%, transparent) !important;
+  }
+
+  .theme-paper-surface {
+    background-color: var(--surface-panel) !important;
+    color: var(--copy-strong) !important;
+  }
+
+  .theme-ink-surface {
+    background-color: var(--surface-ink) !important;
+    color: var(--copy-inverse) !important;
+  }
+
+  .theme-secondary-surface {
+    background-color: var(--surface-panel-muted) !important;
+    color: var(--copy-strong) !important;
+  }
+
+  .theme-border {
+    border-color: var(--line-strong) !important;
+  }
+
+  .theme-surface-page {
+    background-color: var(--surface-page) !important;
+    color: var(--copy-strong) !important;
+  }
+
+  .theme-surface-panel {
+    background-color: var(--surface-panel) !important;
+    color: var(--copy-strong) !important;
+  }
+
+  .theme-surface-panel-muted {
+    background-color: var(--surface-panel-muted) !important;
+    color: var(--copy-strong) !important;
+  }
+
+  .theme-surface-ink {
+    background-color: var(--surface-ink) !important;
+    color: var(--copy-inverse) !important;
+  }
+
+  .theme-border-strong {
+    border-color: var(--line-strong) !important;
+  }
+
+  .theme-border-soft {
+    border-color: var(--line-soft) !important;
+  }
+
+  .theme-border-faint {
+    border-color: var(--line-faint) !important;
+  }
+
+  .theme-text-strong {
+    color: var(--copy-strong) !important;
+  }
+
+  .theme-text-soft {
+    color: var(--copy-soft) !important;
+  }
+
+  .theme-text-muted {
+    color: var(--copy-muted) !important;
+  }
+
+  .theme-text-faint {
+    color: var(--copy-faint) !important;
+  }
+
+  .theme-text-inverse {
+    color: var(--copy-inverse) !important;
+  }
+
   .font-heading {
     font-family: var(--font-heading);
   }
@@ -112,6 +398,19 @@
 
   .manga-panel-reverse {
     box-shadow: var(--panel-shadow-reverse);
+  }
+
+  .manga-panel-hover {
+    box-shadow: none;
+  }
+
+  .manga-preview-media {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .manga-preview-media img {
+    filter: var(--preview-image-filter);
   }
 
   .ink-border-heavy {
@@ -134,7 +433,7 @@
   .manga-speed-lines {
     background: repeating-conic-gradient(
       from 0deg,
-      rgba(17, 17, 17, 0.14) 0deg 0.9deg,
+      var(--hero-speed-line) 0deg 0.9deg,
       transparent 0.9deg 10deg
     );
   }
@@ -160,17 +459,16 @@
   .site-tracing-header {
     position: relative;
     isolation: isolate;
-    border: 2px solid rgba(17, 17, 17, 0.26);
+    border: 2px solid var(--line-soft);
     border-bottom-width: 5px;
-    background:
-      linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.84) 0%,
-        rgba(255, 255, 255, 0.68) 100%
-      );
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--surface-header) 92%, transparent) 0%,
+      color-mix(in srgb, var(--surface-header) 72%, transparent) 100%
+    );
     box-shadow:
-      0 10px 28px rgba(17, 17, 17, 0.08),
-      inset 0 1px 0 rgba(255, 255, 255, 0.72);
+      0 10px 28px color-mix(in srgb, var(--surface-ink) 8%, transparent),
+      inset 0 1px 0 color-mix(in srgb, var(--surface-header-gloss) 72%, transparent);
     backdrop-filter: blur(16px) saturate(110%);
     -webkit-backdrop-filter: blur(16px) saturate(110%);
   }
@@ -182,10 +480,10 @@
     background:
       linear-gradient(
         90deg,
-        rgba(255, 255, 255, 0.18) 0%,
-        rgba(255, 255, 255, 0.05) 22%,
-        rgba(255, 255, 255, 0.12) 52%,
-        rgba(255, 255, 255, 0.2) 100%
+        color-mix(in srgb, var(--surface-header-gloss) 92%, transparent) 0%,
+        color-mix(in srgb, var(--surface-header-gloss) 28%, transparent) 22%,
+        color-mix(in srgb, var(--surface-header-gloss) 54%, transparent) 52%,
+        color-mix(in srgb, var(--surface-header-gloss) 100%, transparent) 100%
       );
     pointer-events: none;
   }
@@ -199,16 +497,57 @@
     clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
   }
 
+  .theme-slider {
+    --theme-slider-track: linear-gradient(
+      90deg,
+      var(--surface-panel) 0%,
+      var(--surface-panel-muted) 100%
+    );
+    appearance: none;
+    width: 100%;
+    height: 1.15rem;
+    border: 3px solid var(--line-strong);
+    border-radius: 999px;
+    background: var(--theme-slider-track);
+    cursor: pointer;
+  }
+
+  .theme-slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 0.85rem;
+    height: 1.55rem;
+    border: 2px solid var(--line-strong);
+    border-radius: 0.2rem;
+    background: var(--surface-panel);
+    box-shadow: 2px 2px 0 0 var(--surface-ink);
+  }
+
+  .theme-slider::-moz-range-thumb {
+    width: 0.85rem;
+    height: 1.55rem;
+    border: 2px solid var(--line-strong);
+    border-radius: 0.2rem;
+    background: var(--surface-panel);
+    box-shadow: 2px 2px 0 0 var(--surface-ink);
+  }
+
+  .theme-slider::-moz-range-track {
+    height: 1.15rem;
+    border: 0;
+    border-radius: 999px;
+    background: var(--theme-slider-track);
+  }
+
   .interactive-dot-background {
     --spotlight-x: 50vw;
     --spotlight-y: 30vh;
     --spotlight-opacity: 0;
     --dot-grid-size: 14px;
-    --base-dot-color: rgba(17, 17, 17, 0.14);
-    --focus-dot-color: rgba(17, 17, 17, 0.72);
+    --base-dot-color: color-mix(in srgb, var(--ink) 14%, transparent);
+    --focus-dot-color: color-mix(in srgb, var(--ink) 72%, transparent);
     position: fixed;
     inset: 0;
-    z-index: 0;
+    z-index: 5;
     overflow: hidden;
     pointer-events: none;
   }
@@ -234,10 +573,10 @@
     background:
       radial-gradient(
         280px circle at var(--spotlight-x) var(--spotlight-y),
-        rgba(255, 255, 255, 0.95) 0%,
-        rgba(255, 255, 255, 0.82) 26%,
-        rgba(255, 255, 255, 0.32) 48%,
-        rgba(255, 255, 255, 0) 78%
+        color-mix(in srgb, var(--surface-page) 95%, transparent) 0%,
+        color-mix(in srgb, var(--surface-page) 82%, transparent) 26%,
+        color-mix(in srgb, var(--surface-page) 32%, transparent) 48%,
+        color-mix(in srgb, var(--surface-page) 0%, transparent) 78%
       );
     opacity: calc(var(--spotlight-opacity) * 0.95);
     transition: opacity 180ms ease-out;

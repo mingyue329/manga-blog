@@ -1,4 +1,5 @@
-import type { ReactElement } from 'react'
+import { useEffect, useRef, type ReactElement } from 'react'
+import { gsap } from 'gsap'
 import { Link } from 'react-router-dom'
 
 import { Badge } from '@/shared/ui/badge'
@@ -18,9 +19,6 @@ interface PostPreviewSheetProps {
   onOpenChange: (open: boolean) => void
 }
 
-/**
- * 渲染文章预览分节内容。
- */
 function renderPreviewSections(post: ArchivePost): ReactElement[] {
   const elements: ReactElement[] = []
 
@@ -38,15 +36,53 @@ function renderPreviewSections(post: ArchivePost): ReactElement[] {
   return elements
 }
 
-/**
- * 渲染文章预览抽屉。
- * 抽屉保留了“先快速预览，再决定是否进入详情页”的轻量阅读路径。
- */
 export function PostPreviewSheet({
   post,
   open,
   onOpenChange,
 }: PostPreviewSheetProps): ReactElement | null {
+  const contentRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    const contentElement = contentRef.current
+
+    if (!contentElement) {
+      return
+    }
+
+    const prefersReducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches
+
+    if (open) {
+      gsap.fromTo(
+        contentElement,
+        {
+          xPercent: prefersReducedMotion ? 0 : 8,
+          autoAlpha: 0,
+        },
+        {
+          xPercent: 0,
+          autoAlpha: 1,
+          duration: prefersReducedMotion ? 0.01 : 0.32,
+          ease: prefersReducedMotion ? 'none' : 'power3.out',
+        },
+      )
+      return
+    }
+
+    gsap.to(contentElement, {
+      xPercent: prefersReducedMotion ? 0 : 6,
+      autoAlpha: 0,
+      duration: prefersReducedMotion ? 0.01 : 0.22,
+      ease: prefersReducedMotion ? 'none' : 'power2.inOut',
+    })
+
+    return () => {
+      gsap.killTweensOf(contentElement)
+    }
+  }, [open])
+
   if (!post) {
     return null
   }
@@ -54,6 +90,8 @@ export function PostPreviewSheet({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
+        ref={contentRef}
+        forceMount
         side="right"
         className="w-full overflow-y-auto border-l-4 border-black bg-white sm:max-w-2xl"
       >
@@ -83,9 +121,7 @@ export function PostPreviewSheet({
             ))}
           </div>
           <Button asChild variant="ink" size="lg">
-            <Link to={`/posts/${post.slug}`}>
-              进入详情页阅读
-            </Link>
+            <Link to={`/posts/${post.slug}`}>进入详情页阅读</Link>
           </Button>
           {renderPreviewSections(post)}
         </div>

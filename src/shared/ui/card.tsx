@@ -4,18 +4,23 @@ import { cn } from '@/shared/lib/utils'
 
 /**
  * 鍗＄墖瀹瑰櫒銆? * 椤甸潰涓殑澶ч儴鍒嗛潰鏉块兘鍩轰簬瀹冩瀯寤猴紝鍥犳杩欓噷缁熶竴鏀跺彛杈规銆佽儗鏅拰闃村奖椋庢牸銆? */
-function Card({ className, ...props }: React.ComponentProps<'div'>) {
-  return (
-    <div
-      data-slot="card"
-      className={cn(
-        'flex flex-col gap-6 bg-card py-6 text-card-foreground shadow-none',
-        className,
-      )}
-      {...props}
-    />
-  )
-}
+const Card = React.forwardRef<HTMLDivElement, React.ComponentProps<'div'>>(
+  ({ className, ...props }, ref) => {
+    return (
+      <div
+        ref={ref}
+        data-slot="card"
+        className={cn(
+          'flex flex-col gap-6 bg-card py-6 text-card-foreground shadow-none',
+          className,
+        )}
+        {...props}
+      />
+    )
+  },
+)
+
+Card.displayName = 'Card'
 
 /**
  * 鍗＄墖澶撮儴鍖哄煙銆? */

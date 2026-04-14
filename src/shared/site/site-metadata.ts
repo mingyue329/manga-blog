@@ -7,6 +7,9 @@
  */
 export const siteMetadata = {
   title: 'KawaiiTech | 星码绽放',
+  description: '黑白漫画科技风的个人博客，记录游戏、技术与创作过程。',
+  siteUrl: 'https://example.com',
+  language: 'zh',
   faviconPath: 'favicon.ico',
 } as const
 

@@ -11,14 +11,18 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: 'border-black bg-black text-white [a&]:hover:bg-black/90',
-        ink: 'border-black bg-black text-white [a&]:hover:bg-black/90',
-        outlineInk: 'border-black bg-white text-black [a&]:hover:bg-secondary',
-        secondary: 'border-black bg-secondary text-black [a&]:hover:bg-white',
+        default:
+          'border-[var(--line-strong)] bg-[var(--surface-ink)] text-[var(--copy-inverse)] [a&]:hover:opacity-90',
+        ink:
+          'border-[var(--line-strong)] bg-[var(--surface-ink)] text-[var(--copy-inverse)] [a&]:hover:opacity-90',
+        outlineInk:
+          'border-[var(--line-strong)] bg-[var(--surface-panel)] text-[var(--copy-strong)] [a&]:hover:bg-secondary',
+        secondary:
+          'border-[var(--line-strong)] bg-secondary text-[var(--secondary-foreground)] [a&]:hover:bg-[var(--surface-panel)]',
         destructive:
           'border-destructive bg-destructive text-white [a&]:hover:bg-destructive/90',
         outline:
-          'border-black text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground',
+          'border-[var(--ink)] text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground',
         ghost: '[a&]:hover:bg-accent [a&]:hover:text-accent-foreground',
         link: 'text-primary underline-offset-4 [a&]:hover:underline',
       },

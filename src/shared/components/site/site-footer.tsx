@@ -15,15 +15,28 @@ function renderFooterLinks(links: FooterLink[]): ReactElement[] {
 
   for (let index = 0; index < links.length; index += 1) {
     const link = links[index]
+    const shouldUseAnchor = link.external || /\.(xml|txt)$/u.test(link.to)
 
-    elements.push(
-      <Link
-        key={`${link.label}-${link.to}`}
-        to={link.to}
-        className="text-xs font-bold uppercase tracking-[0.24em] text-black/70 transition-colors hover:text-black hover:underline"
+    const linkElement = shouldUseAnchor ? (
+      <a
+        href={link.to}
+        target={link.external ? '_blank' : undefined}
+        rel={link.external ? 'noreferrer' : undefined}
+        className="theme-text-soft text-xs font-bold uppercase tracking-[0.24em] transition-colors hover:text-[var(--copy-strong)] hover:underline"
       >
         {link.label}
-      </Link>,
+      </a>
+    ) : (
+      <Link
+        to={link.to}
+        className="theme-text-soft text-xs font-bold uppercase tracking-[0.24em] transition-colors hover:text-[var(--copy-strong)] hover:underline"
+      >
+        {link.label}
+      </Link>
+    )
+
+    elements.push(
+      <span key={`${link.label}-${link.to}`}>{linkElement}</span>,
     )
 
     if (index < links.length - 1) {
@@ -31,7 +44,7 @@ function renderFooterLinks(links: FooterLink[]): ReactElement[] {
         <Separator
           key={`${link.label}-separator`}
           orientation="vertical"
-          className="hidden h-4 bg-black/20 md:block"
+          className="hidden h-4 bg-[var(--line-faint)] md:block"
         />,
       )
     }
@@ -44,11 +57,11 @@ function renderFooterLinks(links: FooterLink[]): ReactElement[] {
  * 娓叉煋绔欑偣椤佃剼銆? * 椤佃剼鏄叏灞€甯冨眬鐨勪竴閮ㄥ垎锛屽洜姝ゅ彧娑堣垂绔欑偣閰嶇疆锛屼笉渚濊禆鍏蜂綋椤甸潰鏁版嵁銆? */
 export function SiteFooter({ config }: SiteFooterProps): ReactElement {
   return (
-    <footer className="border-t-4 border-black bg-transparent">
+    <footer className="theme-border-strong border-t-4 bg-transparent">
       <div className="site-shell flex flex-col items-center gap-6 py-12 text-center">
         <Link
           to="/"
-          className="border-b-4 border-black font-heading text-3xl font-black uppercase tracking-tight"
+          className="theme-border-strong border-b-4 font-heading text-3xl font-black uppercase tracking-tight"
         >
           {config.brand.primaryLabel} // {config.brand.secondaryLabel}
         </Link>
@@ -56,13 +69,13 @@ export function SiteFooter({ config }: SiteFooterProps): ReactElement {
           {renderFooterLinks(config.footer.links)}
         </div>
         <div className="space-y-2">
-          <p className="text-xs font-black uppercase tracking-[0.24em] text-black/80">
+          <p className="theme-text-strong text-xs font-black uppercase tracking-[0.24em]">
             {config.footer.copyright}
           </p>
           <div className="flex items-center justify-center gap-2">
-            <span className="size-2 bg-black" />
-            <span className="size-2 bg-black" />
-            <span className="size-2 bg-black" />
+            <span className="theme-surface-ink size-2" />
+            <span className="theme-surface-ink size-2" />
+            <span className="theme-surface-ink size-2" />
           </div>
         </div>
       </div>

@@ -318,14 +318,15 @@ export interface ArchivePost {
 }
 
 /**
- * 表示统一文章内容源中的一篇 Markdown 文档。
- * 这个类型位于 ArchivePost 之下，是更底层的“原始内容模型”，同时携带 frontmatter 元数据和正文内容。
+ * 表示一篇 Markdown 文章经过校验后的 frontmatter 数据。
+ * 这里把正文之外的元信息单独抽出，方便后续做 RSS、搜索、分页和 SEO 派生。
  */
-export interface MarkdownPostDocument {
+export interface MarkdownPostFrontmatter {
   slug: string
   title: string
   excerpt: string
   publishedAt: string
+  updatedAt: string | null
   author: string
   categoryKey: PostCategoryKey
   image: ImageAsset
@@ -334,7 +335,15 @@ export interface MarkdownPostDocument {
   series: string | null
   tags: string[]
   featured: boolean
+  draft: boolean
   previewSections: PostPreviewSection[]
+}
+
+/**
+ * 表示统一文章内容源中的一篇 Markdown 文档。
+ * 这个类型位于 frontmatter 之上，在校验后的元数据基础上再附带正文内容。
+ */
+export interface MarkdownPostDocument extends MarkdownPostFrontmatter {
   markdownContent: string
 }
 
