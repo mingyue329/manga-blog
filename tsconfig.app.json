@@ -28,5 +28,9 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": [
+    "src/shared/site/static-site-assets.ts",
+    "src/shared/site/pagefind-search-assets.ts"
+  ]
 }

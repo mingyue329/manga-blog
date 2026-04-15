@@ -1,4 +1,4 @@
-﻿import type { ReactElement } from 'react'
+import type { ReactElement } from 'react'
 import { Link } from 'react-router-dom'
 
 import { Separator } from '@/shared/ui/separator'
@@ -63,7 +63,7 @@ export function SiteFooter({ config }: SiteFooterProps): ReactElement {
           to="/"
           className="theme-border-strong border-b-4 font-heading text-3xl font-black uppercase tracking-tight"
         >
-          {config.brand.primaryLabel} // {config.brand.secondaryLabel}
+          {config.brand.primaryLabel}
         </Link>
         <div className="flex flex-wrap items-center justify-center gap-3 md:gap-4">
           {renderFooterLinks(config.footer.links)}

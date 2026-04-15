@@ -1,14 +1,22 @@
-import type { ReactElement } from 'react'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
+import type { ReactElement } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
+import rehypeHighlight from "rehype-highlight";
+import "highlight.js/styles/atom-one-dark.css";
 
 interface PostMarkdownProps {
-  markdownContent: string
+  markdownContent: string;
 }
 
 /**
  * 渲染文章详情页中心区域的 Markdown 正文。
- * 这里把常见的标题、列表、引用、表格和代码块样式统一收敛到一处，后续只需要维护 Markdown 文件本身即可。
+ * 支持：
+ * - 基础 Markdown + GFM (表格、任务列表等)
+ * - 代码语法高亮 (highlight.js)
+ * - 视频嵌入 (YouTube、Bilibili)
+ * - 音频嵌入
+ * - 自定义 admonitions (提示、警告等)
  */
 export function PostMarkdown({
   markdownContent,
@@ -43,7 +51,27 @@ export function PostMarkdown({
         [&_ul]:my-6 [&_ul]:ml-6 [&_ul]:list-disc
       "
     >
-      <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdownContent}</ReactMarkdown>
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        rehypePlugins={[rehypeRaw, rehypeHighlight]}
+        components={{
+          // 自定义视频渲染
+          video: ({ src, ...props }) => (
+            <video
+              src={src}
+              controls
+              className="my-8 w-full rounded-lg border-4 border-[var(--line-strong)]"
+              {...props}
+            />
+          ),
+          // 自定义音频渲染
+          audio: ({ src, ...props }) => (
+            <audio src={src} controls className="my-8 w-full" {...props} />
+          ),
+        }}
+      >
+        {markdownContent}
+      </ReactMarkdown>
     </div>
-  )
+  );
 }

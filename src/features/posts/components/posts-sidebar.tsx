@@ -81,7 +81,7 @@ export function PostsSidebar({
   pagefindSearchErrorMessage,
 }: PostsSidebarProps): ReactElement {
   return (
-    <aside className="space-y-8 lg:sticky lg:top-32">
+    <aside data-route-enter className="space-y-5 lg:sticky lg:top-32">
       <Card className="theme-surface-panel theme-border-strong border-4 py-0 manga-panel">
         <CardContent className="p-4">
           <div className="relative">
@@ -99,7 +99,10 @@ export function PostsSidebar({
       </Card>
 
       {searchKeyword ? (
-        <Card className="theme-surface-panel theme-border-strong border-4 py-0">
+        <Card
+          data-route-enter
+          className="theme-surface-panel theme-border-strong border-4 py-0"
+        >
           <CardContent className="space-y-5 p-5">
             <div className="flex items-start justify-between gap-4">
               <div className="space-y-1">
@@ -172,7 +175,7 @@ export function PostsSidebar({
         </Card>
       ) : null}
 
-      <section className="space-y-4">
+      <section data-route-enter className="space-y-4">
         <h3 className="flex items-center gap-2 font-heading text-xl font-black tracking-tight">
           <Tag className="size-5" />
           {tagsTitle}
@@ -200,7 +203,10 @@ export function PostsSidebar({
         </div>
       </section>
 
-      <Card className="theme-surface-panel-muted theme-border-strong relative overflow-hidden border-4 py-0">
+      <Card
+        data-route-enter
+        className="theme-surface-panel-muted theme-border-strong relative overflow-hidden border-4 py-0"
+      >
         <div className="theme-text-faint absolute -right-4 -top-4 opacity-40">
           <Award className="size-24" />
         </div>

@@ -1,4 +1,4 @@
-﻿import { useEffect } from 'react'
+import { useLayoutEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 
 import {
@@ -11,7 +11,7 @@ import {
 export function HashScrollHandler(): null {
   const { hash, pathname } = useLocation()
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const preferredAnchorTarget = hash ? hash.replace('#', '') : null
     const fallbackAnchorTarget = preferredAnchorTarget
       ? null

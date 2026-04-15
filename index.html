@@ -8,54 +8,99 @@
     <script>
       ;(() => {
         const THEME_STORAGE_KEY = 'kawaiitech-theme'
-        const PAPER_TONE_STORAGE_KEY = 'kawaiitech-paper-tone'
-        const INK_TONE_STORAGE_KEY = 'kawaiitech-ink-tone'
-        const paperToneOptions = [
-          '#fbf8ef',
-          '#f8f7f4',
-          '#f3eee2',
-          '#ecefe8',
-          '#e8edf3',
-          '#efe7df',
+        const HUE_STORAGE_KEY = 'kawaiitech-theme-hue'
+        const CONTRAST_TONE_STORAGE_KEY = 'kawaiitech-contrast-tone'
+        const DEFAULT_THEME_HUE = 250
+        const DEFAULT_CONTRAST_TONE_INDEX = 2
+        const contrastToneOptions = [
+          {
+            paper: { lightness: 0.982, chroma: 0.008 },
+            ink: { lightness: 0.18, chroma: 0.008 },
+          },
+          {
+            paper: { lightness: 0.968, chroma: 0.01 },
+            ink: { lightness: 0.21, chroma: 0.012 },
+          },
+          {
+            paper: { lightness: 0.952, chroma: 0.013 },
+            ink: { lightness: 0.24, chroma: 0.016 },
+          },
+          {
+            paper: { lightness: 0.936, chroma: 0.016 },
+            ink: { lightness: 0.27, chroma: 0.02 },
+          },
+          {
+            paper: { lightness: 0.918, chroma: 0.02 },
+            ink: { lightness: 0.3, chroma: 0.024 },
+          },
+          {
+            paper: { lightness: 0.9, chroma: 0.024 },
+            ink: { lightness: 0.34, chroma: 0.028 },
+          },
         ]
-        const inkToneOptions = [
-          '#111111',
-          '#1a1a1a',
-          '#1b2430',
-          '#20271d',
-          '#2a231d',
-          '#171a24',
-        ]
+
+        const clampHue = (value) => {
+          if (!Number.isFinite(value)) {
+            return DEFAULT_THEME_HUE
+          }
+
+          const normalizedValue = Math.round(value) % 361
+
+          return normalizedValue < 0 ? normalizedValue + 361 : normalizedValue
+        }
+
+        const clampIndex = (value, options) => {
+          if (!Number.isFinite(value)) {
+            return 0
+          }
+
+          return Math.min(Math.max(Math.round(value), 0), options.length - 1)
+        }
+
+        const buildThemeToneColor = (tone, hue) =>
+          `oklch(${tone.lightness} ${tone.chroma} ${hue})`
 
         const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY)
-        const storedPaperTone = Number.parseInt(
-          window.localStorage.getItem(PAPER_TONE_STORAGE_KEY) ?? '1',
+        const storedHue = Number.parseInt(
+          window.localStorage.getItem(HUE_STORAGE_KEY) ?? `${DEFAULT_THEME_HUE}`,
           10,
         )
-        const storedInkTone = Number.parseInt(
-          window.localStorage.getItem(INK_TONE_STORAGE_KEY) ?? '0',
+        const storedContrastToneIndex = Number.parseInt(
+          window.localStorage.getItem(CONTRAST_TONE_STORAGE_KEY) ??
+            `${DEFAULT_CONTRAST_TONE_INDEX}`,
           10,
-        )
-        const paperToneIndex = Math.min(
-          Math.max(Number.isFinite(storedPaperTone) ? storedPaperTone : 1, 0),
-          paperToneOptions.length - 1,
-        )
-        const inkToneIndex = Math.min(
-          Math.max(Number.isFinite(storedInkTone) ? storedInkTone : 0, 0),
-          inkToneOptions.length - 1,
         )
 
-        document.documentElement.classList.toggle('dark', storedTheme === 'dark')
-        document.documentElement.dataset.theme =
-          storedTheme === 'dark' ? 'dark' : 'light'
+        const resolvedTheme =
+          storedTheme === 'dark'
+            ? 'dark'
+            : storedTheme === 'light'
+              ? 'light'
+              : window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'dark'
+                : 'light'
+        const hue = clampHue(storedHue)
+        const contrastToneIndex = clampIndex(
+          storedContrastToneIndex,
+          contrastToneOptions,
+        )
+        const contrastOption = contrastToneOptions[contrastToneIndex]
+
+        document.documentElement.classList.toggle('dark', resolvedTheme === 'dark')
+        document.documentElement.dataset.theme = resolvedTheme
+        document.documentElement.dataset.themeMode =
+          storedTheme === 'light' || storedTheme === 'dark' || storedTheme === 'system'
+            ? storedTheme
+            : 'system'
         document.documentElement.style.setProperty(
           '--theme-paper-base',
-          paperToneOptions[paperToneIndex],
+          buildThemeToneColor(contrastOption.paper, hue),
         )
         document.documentElement.style.setProperty(
           '--theme-ink-base',
-          inkToneOptions[inkToneIndex],
+          buildThemeToneColor(contrastOption.ink, hue),
         )
+        document.documentElement.style.setProperty('--theme-hue', String(hue))
       })()
     </script>
   </head>

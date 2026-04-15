@@ -1,4 +1,4 @@
-﻿import type { ReactElement } from 'react'
+import type { ReactElement } from 'react'
 import { useLoaderData } from 'react-router-dom'
 
 import { HeroAndStatusSection } from '@/features/home/components/hero-and-status-section'
@@ -19,15 +19,21 @@ export function HomePage(): ReactElement {
 
   return (
     <div className="space-y-16 md:space-y-24">
-      <HeroAndStatusSection
-        hero={pageData.hero}
-        statusPanel={pageData.statusPanel}
-      />
-      <UpdatesSection updates={pageData.updates} />
-      <PlayingAndStackSection
-        playing={pageData.playing}
-        stack={pageData.stack}
-      />
+      <div data-route-enter>
+        <HeroAndStatusSection
+          hero={pageData.hero}
+          statusPanel={pageData.statusPanel}
+        />
+      </div>
+      <div data-route-enter>
+        <UpdatesSection updates={pageData.updates} />
+      </div>
+      <div data-route-enter>
+        <PlayingAndStackSection
+          playing={pageData.playing}
+          stack={pageData.stack}
+        />
+      </div>
     </div>
   )
 }

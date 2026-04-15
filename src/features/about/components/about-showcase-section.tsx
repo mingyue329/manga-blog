@@ -1,27 +1,27 @@
-import type { ReactElement } from 'react'
+import type { ReactElement } from "react";
 
 import {
   useGsapHoverLift,
   useGsapHoverPreviewCard,
-} from '@/shared/lib/use-gsap-hover-preview-card'
-import { Card, CardContent } from '@/shared/ui/card'
-import type { AboutShowcasePanel } from '@/shared/types/content'
+} from "@/shared/lib/use-gsap-hover-preview-card";
+import { Card, CardContent } from "@/shared/ui/card";
+import type { AboutShowcasePanel } from "@/shared/types/content";
 
 interface AboutShowcaseSectionProps {
-  panels: AboutShowcasePanel[]
+  panels: AboutShowcasePanel[];
 }
 
 function StatementPanel({
   panel,
 }: {
-  panel: AboutShowcasePanel
+  panel: AboutShowcasePanel;
 }): ReactElement {
-  const { triggerRef, targetRef } = useGsapHoverLift(8)
+  const { triggerRef, targetRef } = useGsapHoverLift(8);
 
   return (
-    <div ref={triggerRef}>
+    <div ref={triggerRef as React.RefObject<HTMLDivElement>}>
       <Card
-        ref={targetRef as React.Ref<HTMLDivElement>}
+        ref={targetRef}
         className="overflow-hidden border-4 border-black bg-black py-0"
       >
         <CardContent className="manga-halftone flex h-48 items-center justify-center p-0 text-white">
@@ -31,14 +31,15 @@ function StatementPanel({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
 
 function ImagePanel({ panel }: { panel: AboutShowcasePanel }): ReactElement {
-  const { triggerRef, cardRef, imageRef, overlayRef } = useGsapHoverPreviewCard()
+  const { triggerRef, cardRef, imageRef, overlayRef } =
+    useGsapHoverPreviewCard();
 
   return (
-    <div ref={triggerRef}>
+    <div ref={triggerRef as React.RefObject<HTMLDivElement>}>
       <Card
         ref={cardRef}
         className="manga-panel-hover overflow-hidden border-4 border-black bg-white py-0"
@@ -51,7 +52,7 @@ function ImagePanel({ panel }: { panel: AboutShowcasePanel }): ReactElement {
           <img
             ref={imageRef}
             src={panel.image?.src}
-            alt={panel.image?.alt ?? ''}
+            alt={panel.image?.alt ?? ""}
             className="h-full w-full object-cover"
             loading="lazy"
           />
@@ -63,15 +64,15 @@ function ImagePanel({ panel }: { panel: AboutShowcasePanel }): ReactElement {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
 
 function ShowcasePanel({ panel }: { panel: AboutShowcasePanel }): ReactElement {
-  if (panel.type === 'statement') {
-    return <StatementPanel panel={panel} />
+  if (panel.type === "statement") {
+    return <StatementPanel panel={panel} />;
   }
 
-  return <ImagePanel panel={panel} />
+  return <ImagePanel panel={panel} />;
 }
 
 export function AboutShowcaseSection({
@@ -89,5 +90,5 @@ export function AboutShowcaseSection({
         ))}
       </div>
     </section>
-  )
+  );
 }

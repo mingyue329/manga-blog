@@ -6,167 +6,280 @@ import {
   useState,
   type ReactElement,
   type ReactNode,
-} from 'react'
+} from "react";
 
 import {
-  clampThemeToneIndex,
-  DEFAULT_INK_TONE_INDEX,
-  DEFAULT_PAPER_TONE_INDEX,
-  findThemeToneIndex,
-  INK_TONE_OPTIONS,
-  INK_TONE_STORAGE_KEY,
+  buildThemeToneColor,
+  clampThemeHue,
+  clampThemeContrastIndex,
+  CONTRAST_TONE_STORAGE_KEY,
+  DEFAULT_CONTRAST_TONE_INDEX,
+  DEFAULT_THEME_HUE,
+  findThemeContrastIndex,
+  HUE_STORAGE_KEY,
   LEGACY_INK_COLOR_STORAGE_KEY,
   LEGACY_PAPER_COLOR_STORAGE_KEY,
-  PAPER_TONE_OPTIONS,
-  PAPER_TONE_STORAGE_KEY,
+  THEME_CONTRAST_OPTIONS,
   THEME_STORAGE_KEY,
-  type ThemeToneOption,
-} from '@/shared/site/theme-options'
+  type ThemeContrastOption,
+} from "@/shared/site/theme-options";
 
-type SiteTheme = 'light' | 'dark'
+type SiteTheme = "light" | "dark" | "system";
+type ResolvedSiteTheme = "light" | "dark";
 
 interface ThemeContextValue {
-  theme: SiteTheme
-  paperToneIndex: number
-  inkToneIndex: number
-  paperToneLabel: string
-  inkToneLabel: string
-  paperToneOptions: readonly ThemeToneOption[]
-  inkToneOptions: readonly ThemeToneOption[]
-  paperColor: string
-  inkColor: string
-  toggleTheme: () => void
-  setPaperToneIndex: (value: number) => void
-  setInkToneIndex: (value: number) => void
-  resetThemeColors: () => void
+  theme: SiteTheme;
+  resolvedTheme: ResolvedSiteTheme;
+  hue: number;
+  contrastToneIndex: number;
+  contrastToneLabel: string;
+  contrastToneOptions: readonly ThemeContrastOption[];
+  paperColor: string;
+  inkColor: string;
+  toggleTheme: () => void;
+  setTheme: (value: SiteTheme) => void;
+  setHue: (value: number) => void;
+  setContrastToneIndex: (value: number) => void;
+  resetThemeColors: () => void;
 }
 
-const ThemeContext = createContext<ThemeContextValue | null>(null)
+const ThemeContext = createContext<ThemeContextValue | null>(null);
 
-function applyTheme(theme: SiteTheme): void {
-  document.documentElement.classList.toggle('dark', theme === 'dark')
-  document.documentElement.dataset.theme = theme
-}
-
-function applyThemeColors(paperToneIndex: number, inkToneIndex: number): void {
-  document.documentElement.style.setProperty(
-    '--theme-paper-base',
-    PAPER_TONE_OPTIONS[paperToneIndex].value,
-  )
-  document.documentElement.style.setProperty(
-    '--theme-ink-base',
-    INK_TONE_OPTIONS[inkToneIndex].value,
-  )
-}
-
-function getStoredThemeToneIndex({
-  storageKey,
-  legacyColorKey,
-  options,
-  defaultIndex,
-}: {
-  storageKey: string
-  legacyColorKey: string
-  options: readonly ThemeToneOption[]
-  defaultIndex: number
-}): number {
-  if (typeof window === 'undefined') {
-    return defaultIndex
+/**
+ * 读取系统当前的明暗模式。
+ * 当用户选择 `system` 时，最终主题会跟随这里的结果变化。
+ */
+function getSystemTheme(): ResolvedSiteTheme {
+  if (typeof window === "undefined") {
+    return "light";
   }
 
-  const storedIndex = window.localStorage.getItem(storageKey)
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+}
+
+/**
+ * 解析当前真正应用到页面上的主题。
+ * 只有 `system` 需要额外依赖系统结果，其它模式直接返回自身。
+ */
+function resolveTheme(
+  theme: SiteTheme,
+  systemTheme: ResolvedSiteTheme,
+): ResolvedSiteTheme {
+  if (theme === "system") {
+    return systemTheme;
+  }
+
+  return theme;
+}
+
+/**
+ * 把解析后的主题写入根节点。
+ * `data-theme-mode` 保留用户选择，`data-theme` 保留最终生效结果，后续样式可以同时利用这两个状态。
+ */
+function applyTheme(theme: SiteTheme, resolvedTheme: ResolvedSiteTheme): void {
+  document.documentElement.classList.toggle("dark", resolvedTheme === "dark");
+  document.documentElement.dataset.theme = resolvedTheme;
+  document.documentElement.dataset.themeMode = theme;
+}
+
+/**
+ * 按顺序循环切换主题模式。
+ * 头部原有图标按钮会复用这个顺序，在三种模式之间来回切换。
+ */
+function getNextTheme(theme: SiteTheme): SiteTheme {
+  if (theme === "light") {
+    return "dark";
+  }
+
+  if (theme === "dark") {
+    return "system";
+  }
+
+  return "light";
+}
+
+/**
+ * 把主题色相与色阶写入根节点变量。
+ * 页面里的纸面色、墨色和衍生层级都依赖这些基础变量再继续混色。
+ */
+function applyThemeColors(hue: number, contrastToneIndex: number): void {
+  const contrastOption = THEME_CONTRAST_OPTIONS[contrastToneIndex];
+
+  document.documentElement.style.setProperty(
+    "--theme-paper-base",
+    buildThemeToneColor(contrastOption.paper, hue),
+  );
+  document.documentElement.style.setProperty(
+    "--theme-ink-base",
+    buildThemeToneColor(contrastOption.ink, hue),
+  );
+  document.documentElement.style.setProperty("--theme-hue", String(hue));
+}
+
+/**
+ * 读取本地存储的对比档位。
+ * 新版本优先读取统一档位；如果没有，再尝试从旧的纸色/墨色缓存回推。
+ */
+function getStoredThemeContrastIndex(): number {
+  if (typeof window === "undefined") {
+    return DEFAULT_CONTRAST_TONE_INDEX;
+  }
+
+  const storedIndex = window.localStorage.getItem(CONTRAST_TONE_STORAGE_KEY);
 
   if (storedIndex !== null) {
-    return clampThemeToneIndex(Number.parseInt(storedIndex, 10), options)
+    return clampThemeContrastIndex(
+      Number.parseInt(storedIndex, 10),
+      THEME_CONTRAST_OPTIONS,
+    );
   }
 
-  const legacyColor = window.localStorage.getItem(legacyColorKey)
-  const legacyIndex = findThemeToneIndex(options, legacyColor)
+  const legacyPaperColor = window.localStorage.getItem(
+    LEGACY_PAPER_COLOR_STORAGE_KEY,
+  );
+  const legacyInkColor = window.localStorage.getItem(
+    LEGACY_INK_COLOR_STORAGE_KEY,
+  );
+  const legacyIndex = findThemeContrastIndex(
+    THEME_CONTRAST_OPTIONS,
+    legacyPaperColor,
+    legacyInkColor,
+  );
 
-  return legacyIndex >= 0 ? legacyIndex : defaultIndex
+  return legacyIndex >= 0 ? legacyIndex : DEFAULT_CONTRAST_TONE_INDEX;
 }
 
-export function ThemeProvider({ children }: { children: ReactNode }): ReactElement {
+export function ThemeProvider({
+  children,
+}: {
+  children: ReactNode;
+}): ReactElement {
   const [theme, setTheme] = useState<SiteTheme>(() => {
-    if (typeof window === 'undefined') {
-      return 'light'
+    if (typeof window === "undefined") {
+      return "light";
     }
 
-    const savedTheme = window.localStorage.getItem(THEME_STORAGE_KEY)
-    return savedTheme === 'dark' ? 'dark' : 'light'
-  })
-  const [paperToneIndex, setPaperToneIndex] = useState<number>(() =>
-    getStoredThemeToneIndex({
-      storageKey: PAPER_TONE_STORAGE_KEY,
-      legacyColorKey: LEGACY_PAPER_COLOR_STORAGE_KEY,
-      options: PAPER_TONE_OPTIONS,
-      defaultIndex: DEFAULT_PAPER_TONE_INDEX,
-    }),
-  )
-  const [inkToneIndex, setInkToneIndex] = useState<number>(() =>
-    getStoredThemeToneIndex({
-      storageKey: INK_TONE_STORAGE_KEY,
-      legacyColorKey: LEGACY_INK_COLOR_STORAGE_KEY,
-      options: INK_TONE_OPTIONS,
-      defaultIndex: DEFAULT_INK_TONE_INDEX,
-    }),
-  )
+    const savedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
+    if (
+      savedTheme === "light" ||
+      savedTheme === "dark" ||
+      savedTheme === "system"
+    ) {
+      return savedTheme;
+    }
 
-  const paperColor = PAPER_TONE_OPTIONS[paperToneIndex].value
-  const inkColor = INK_TONE_OPTIONS[inkToneIndex].value
+    return "system";
+  });
+  const [systemTheme, setSystemTheme] =
+    useState<ResolvedSiteTheme>(getSystemTheme);
+  const [hue, setHue] = useState<number>(() => {
+    if (typeof window === "undefined") {
+      return DEFAULT_THEME_HUE;
+    }
+
+    return clampThemeHue(
+      Number.parseInt(
+        window.localStorage.getItem(HUE_STORAGE_KEY) ?? `${DEFAULT_THEME_HUE}`,
+        10,
+      ),
+    );
+  });
+  const [contrastToneIndex, setContrastToneIndex] = useState<number>(
+    getStoredThemeContrastIndex,
+  );
+  const contrastToneOption = THEME_CONTRAST_OPTIONS[contrastToneIndex];
+  const resolvedTheme = resolveTheme(theme, systemTheme);
+  const paperColor = buildThemeToneColor(contrastToneOption.paper, hue);
+  const inkColor = buildThemeToneColor(contrastToneOption.ink, hue);
 
   useEffect(() => {
-    applyTheme(theme)
-    window.localStorage.setItem(THEME_STORAGE_KEY, theme)
-  }, [theme])
+    const mediaQueryList = window.matchMedia("(prefers-color-scheme: dark)");
+
+    /**
+     * 同步系统主题状态。
+     * 只要操作系统主题变化，这里的解析结果就会自动刷新。
+     */
+    function handleChange(): void {
+      setSystemTheme(mediaQueryList.matches ? "dark" : "light");
+    }
+
+    handleChange();
+
+    mediaQueryList.addEventListener("change", handleChange);
+
+    return () => {
+      mediaQueryList.removeEventListener("change", handleChange);
+    };
+  }, []);
 
   useEffect(() => {
-    applyThemeColors(paperToneIndex, inkToneIndex)
-    window.localStorage.setItem(PAPER_TONE_STORAGE_KEY, String(paperToneIndex))
-    window.localStorage.setItem(INK_TONE_STORAGE_KEY, String(inkToneIndex))
-    window.localStorage.setItem(LEGACY_PAPER_COLOR_STORAGE_KEY, paperColor)
-    window.localStorage.setItem(LEGACY_INK_COLOR_STORAGE_KEY, inkColor)
-  }, [inkColor, inkToneIndex, paperColor, paperToneIndex])
+    applyTheme(theme, resolvedTheme);
+    window.localStorage.setItem(THEME_STORAGE_KEY, theme);
+  }, [resolvedTheme, theme]);
 
-  const contextValue = useMemo<ThemeContextValue>(
-    () => ({
+  useEffect(() => {
+    applyThemeColors(hue, contrastToneIndex);
+    window.localStorage.setItem(HUE_STORAGE_KEY, String(hue));
+    window.localStorage.setItem(
+      CONTRAST_TONE_STORAGE_KEY,
+      String(contrastToneIndex),
+    );
+    window.localStorage.setItem(LEGACY_PAPER_COLOR_STORAGE_KEY, paperColor);
+    window.localStorage.setItem(LEGACY_INK_COLOR_STORAGE_KEY, inkColor);
+  }, [contrastToneIndex, hue, inkColor, paperColor]);
+
+  const contextValue = useMemo<ThemeContextValue>(() => {
+    return {
       theme,
-      paperToneIndex,
-      inkToneIndex,
-      paperToneLabel: PAPER_TONE_OPTIONS[paperToneIndex].label,
-      inkToneLabel: INK_TONE_OPTIONS[inkToneIndex].label,
-      paperToneOptions: PAPER_TONE_OPTIONS,
-      inkToneOptions: INK_TONE_OPTIONS,
+      resolvedTheme,
+      hue,
+      contrastToneIndex,
+      contrastToneLabel: contrastToneOption.label,
+      contrastToneOptions: THEME_CONTRAST_OPTIONS,
       paperColor,
       inkColor,
       toggleTheme: () => {
-        setTheme((currentTheme) => (currentTheme === 'light' ? 'dark' : 'light'))
+        setTheme((currentTheme) => getNextTheme(currentTheme));
       },
-      setPaperToneIndex: (value: number) => {
-        setPaperToneIndex(clampThemeToneIndex(value, PAPER_TONE_OPTIONS))
+      setTheme,
+      setHue: (value: number) => {
+        setHue(clampThemeHue(value));
       },
-      setInkToneIndex: (value: number) => {
-        setInkToneIndex(clampThemeToneIndex(value, INK_TONE_OPTIONS))
+      setContrastToneIndex: (value: number) => {
+        setContrastToneIndex(
+          clampThemeContrastIndex(value, THEME_CONTRAST_OPTIONS),
+        );
       },
       resetThemeColors: () => {
-        setPaperToneIndex(DEFAULT_PAPER_TONE_INDEX)
-        setInkToneIndex(DEFAULT_INK_TONE_INDEX)
+        setHue(DEFAULT_THEME_HUE);
+        setContrastToneIndex(DEFAULT_CONTRAST_TONE_INDEX);
       },
-    }),
-    [theme, paperColor, inkColor, paperToneIndex, inkToneIndex],
-  )
+    };
+  }, [
+    theme,
+    resolvedTheme,
+    hue,
+    contrastToneIndex,
+    contrastToneOption.label,
+    paperColor,
+    inkColor,
+  ]);
 
   return (
-    <ThemeContext.Provider value={contextValue}>{children}</ThemeContext.Provider>
-  )
+    <ThemeContext.Provider value={contextValue}>
+      {children}
+    </ThemeContext.Provider>
+  );
 }
 
 export function useTheme(): ThemeContextValue {
-  const contextValue = useContext(ThemeContext)
+  const contextValue = useContext(ThemeContext);
 
   if (!contextValue) {
-    throw new Error('useTheme must be used within ThemeProvider.')
+    throw new Error("useTheme must be used within ThemeProvider.");
   }
 
-  return contextValue
+  return contextValue;
 }

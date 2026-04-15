@@ -1,5 +1,6 @@
-import type { ReactElement } from 'react'
-import type { LucideIcon } from 'lucide-react'
+import type { ReactElement } from "react";
+import { useEffect } from "react";
+import type { LucideIcon } from "lucide-react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -8,60 +9,64 @@ import {
   Clock3,
   Sparkles,
   Tags,
-} from 'lucide-react'
-import { Link, useLoaderData } from 'react-router-dom'
+} from "lucide-react";
+import { Link, useLoaderData } from "react-router-dom";
 
-import { PostMarkdown } from '@/features/posts/components/post-markdown'
-import { getPostCoverRatioClass } from '@/shared/lib/post-cover-ratio'
-import { useGsapHoverPreviewCard } from '@/shared/lib/use-gsap-hover-preview-card'
-import { cn } from '@/shared/lib/utils'
-import { Badge } from '@/shared/ui/badge'
-import { Button } from '@/shared/ui/button'
-import { Card, CardContent } from '@/shared/ui/card'
+import { PostMarkdown } from "@/features/posts/components/post-markdown";
+import { getPostCoverRatioClass } from "@/shared/lib/post-cover-ratio";
+import { useGsapHoverPreviewCard } from "@/shared/lib/use-gsap-hover-preview-card";
+import { cn } from "@/shared/lib/utils";
+import {
+  buildPostSeoMetadata,
+  generateSeoTags,
+} from "@/shared/site/seo-metadata";
+import { Badge } from "@/shared/ui/badge";
+import { Button } from "@/shared/ui/button";
+import { Card, CardContent } from "@/shared/ui/card";
 import type {
   ArchivePost,
   PostDetailPageData,
   PostReference,
-} from '@/shared/types/content'
+} from "@/shared/types/content";
 
 interface ArticleMetaItem {
-  label: string
-  value: string
-  icon: LucideIcon
+  label: string;
+  value: string;
+  icon: LucideIcon;
 }
 
 /**
  * 读取文章详情页的 loader 数据。
  */
 function usePostDetailPageData(): PostDetailPageData {
-  return useLoaderData() as PostDetailPageData
+  return useLoaderData() as PostDetailPageData;
 }
 
 /**
  * 渲染标签徽章。
  */
 function renderTagBadges(tags: string[]): ReactElement[] {
-  const elements: ReactElement[] = []
+  const elements: ReactElement[] = [];
 
   for (const tag of tags) {
     elements.push(
       <Badge key={tag} variant="outlineInk">
         #{tag}
       </Badge>,
-    )
+    );
   }
 
-  return elements
+  return elements;
 }
 
 /**
  * 渲染文章元信息卡片。
  */
 function renderArticleMetaItems(metaItems: ArticleMetaItem[]): ReactElement[] {
-  const elements: ReactElement[] = []
+  const elements: ReactElement[] = [];
 
   for (const metaItem of metaItems) {
-    const Icon = metaItem.icon
+    const Icon = metaItem.icon;
 
     elements.push(
       <div
@@ -80,20 +85,20 @@ function renderArticleMetaItems(metaItems: ArticleMetaItem[]): ReactElement[] {
           </p>
         </div>
       </div>,
-    )
+    );
   }
 
-  return elements
+  return elements;
 }
 
 /**
  * 渲染“本章线索”列表。
  */
 function renderStorySeedItems(post: ArchivePost): ReactElement[] {
-  const elements: ReactElement[] = []
+  const elements: ReactElement[] = [];
 
   for (let index = 0; index < post.previewSections.length; index += 1) {
-    const previewSection = post.previewSections[index]
+    const previewSection = post.previewSections[index];
 
     elements.push(
       <li
@@ -101,16 +106,16 @@ function renderStorySeedItems(post: ArchivePost): ReactElement[] {
         className="theme-border-faint flex gap-3 border-b-2 pb-3 last:border-b-0 last:pb-0"
       >
         <span className="theme-text-faint font-heading text-sm font-black uppercase tracking-[0.18em]">
-          {String(index + 1).padStart(2, '0')}
+          {String(index + 1).padStart(2, "0")}
         </span>
         <span className="theme-text-soft font-medium leading-7">
           {previewSection.heading}
         </span>
       </li>,
-    )
+    );
   }
 
-  return elements
+  return elements;
 }
 
 /**
@@ -119,9 +124,9 @@ function renderStorySeedItems(post: ArchivePost): ReactElement[] {
 function renderArticleSummaryLine(post: ArchivePost): ReactElement {
   const summaryParts = [
     `By ${post.author}`,
-    post.series ? `Series ${post.series}` : 'Series 单篇文章',
+    post.series ? `Series ${post.series}` : "Series 单篇文章",
     `Cover ${post.coverRatio}`,
-  ]
+  ];
 
   return (
     <div className="theme-text-muted flex flex-wrap items-center gap-x-4 gap-y-2 text-sm font-black uppercase tracking-[0.16em]">
@@ -130,7 +135,7 @@ function renderArticleSummaryLine(post: ArchivePost): ReactElement {
       ))}
       {post.featured ? <Badge variant="outlineInk">精选文章</Badge> : null}
     </div>
-  )
+  );
 }
 
 /**
@@ -138,11 +143,11 @@ function renderArticleSummaryLine(post: ArchivePost): ReactElement {
  */
 function renderArticleFactItems(post: ArchivePost): ReactElement[] {
   const factItems = [
-    { label: 'Author', value: post.author },
-    { label: 'Series', value: post.series ?? '独立篇章' },
-    { label: 'Cover Ratio', value: post.coverRatio },
-    { label: 'Featured', value: post.featured ? 'Yes' : 'No' },
-  ]
+    { label: "Author", value: post.author },
+    { label: "Series", value: post.series ?? "独立篇章" },
+    { label: "Cover Ratio", value: post.coverRatio },
+    { label: "Featured", value: post.featured ? "Yes" : "No" },
+  ];
 
   return factItems.map((factItem) => (
     <div
@@ -156,7 +161,7 @@ function renderArticleFactItems(post: ArchivePost): ReactElement[] {
         {factItem.value}
       </p>
     </div>
-  ))
+  ));
 }
 
 function PostNavigationCard({
@@ -164,19 +169,23 @@ function PostNavigationCard({
   postReference,
   direction,
 }: {
-  label: string
-  postReference: PostReference
-  direction: 'previous' | 'next'
+  label: string;
+  postReference: PostReference;
+  direction: "previous" | "next";
 }): ReactElement {
-  const { triggerRef, cardRef } = useGsapHoverPreviewCard()
+  const { triggerRef, cardRef } = useGsapHoverPreviewCard();
   if (!postReference) {
-    throw new Error('PostNavigationCard requires a post reference.')
+    throw new Error("PostNavigationCard requires a post reference.");
   }
 
-  const DirectionIcon = direction === 'previous' ? ArrowLeft : ArrowRight
+  const DirectionIcon = direction === "previous" ? ArrowLeft : ArrowRight;
 
   return (
-    <Link ref={triggerRef} to={postReference.to} className="group block h-full">
+    <Link
+      ref={triggerRef as React.Ref<HTMLAnchorElement>}
+      to={postReference.to}
+      className="group block h-full"
+    >
       <Card
         ref={cardRef}
         className="manga-panel-hover theme-surface-panel theme-border-strong h-full border-4 py-0"
@@ -195,15 +204,23 @@ function PostNavigationCard({
         </CardContent>
       </Card>
     </Link>
-  )
+  );
 }
 
-function RelatedPostCard({ relatedPost }: { relatedPost: PostReference }): ReactElement {
+function RelatedPostCard({
+  relatedPost,
+}: {
+  relatedPost: PostReference;
+}): ReactElement {
   const { triggerRef, cardRef, shadowRef, imageRef, overlayRef } =
-    useGsapHoverPreviewCard()
+    useGsapHoverPreviewCard();
 
   return (
-    <Link ref={triggerRef} to={relatedPost.to} className="group block h-full">
+    <Link
+      ref={triggerRef as React.Ref<HTMLAnchorElement>}
+      to={relatedPost.to}
+      className="group block h-full"
+    >
       <div className="relative h-full">
         <div
           ref={shadowRef}
@@ -216,7 +233,7 @@ function RelatedPostCard({ relatedPost }: { relatedPost: PostReference }): React
           <CardContent className="p-0">
             <div
               className={cn(
-                'manga-preview-media theme-border-strong border-b-4',
+                "manga-preview-media theme-border-strong border-b-4",
                 getPostCoverRatioClass(relatedPost.coverRatio),
               )}
             >
@@ -253,57 +270,89 @@ function RelatedPostCard({ relatedPost }: { relatedPost: PostReference }): React
         </Card>
       </div>
     </Link>
-  )
+  );
 }
 
 /**
  * 渲染相关文章卡片。
  */
 function renderRelatedPostCards(relatedPosts: PostReference[]): ReactElement[] {
-  const elements: ReactElement[] = []
+  const elements: ReactElement[] = [];
 
   for (const relatedPost of relatedPosts) {
-    elements.push(<RelatedPostCard key={relatedPost.slug} relatedPost={relatedPost} />)
+    elements.push(
+      <RelatedPostCard key={relatedPost.slug} relatedPost={relatedPost} />,
+    );
   }
 
-  return elements
+  return elements;
 }
 
 /**
  * 文章详情页主组件。
  */
 export function PostDetailPage(): ReactElement {
-  const pageData = usePostDetailPageData()
+  const pageData = usePostDetailPageData();
+
+  // 动态设置文章页 SEO 元数据
+  useEffect(() => {
+    const seoMetadata = buildPostSeoMetadata(pageData.post);
+    const seoTags = generateSeoTags(seoMetadata, true);
+
+    // 设置页面标题
+    document.title = seoMetadata.title;
+
+    // 移除旧的 meta 标签（保留基础的 charset 和 viewport）
+    const oldMetaTags = document.querySelectorAll("meta[name], meta[property]");
+    oldMetaTags.forEach((tag) => tag.remove());
+
+    // 创建临时的 div 来解析 HTML 字符串
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = seoTags;
+
+    // 将新的 meta 标签添加到 head
+    tempDiv.querySelectorAll("meta, link[rel='canonical']").forEach((tag) => {
+      document.head.appendChild(tag);
+    });
+
+    // 清理函数：组件卸载时恢复默认标题
+    return () => {
+      document.title = "KawaiiTech | 星码绽放";
+    };
+  }, [pageData.post]);
+
   const articleMetaItems: ArticleMetaItem[] = [
     {
-      label: '发布日期',
+      label: "发布日期",
       value: pageData.post.date,
       icon: CalendarDays,
     },
     {
-      label: '阅读时长',
+      label: "阅读时长",
       value: pageData.readingTimeText,
       icon: Clock3,
     },
     {
-      label: '栏目分类',
+      label: "栏目分类",
       value: pageData.post.categoryLabel,
       icon: Bookmark,
     },
-  ]
+  ];
 
   return (
     <div className="space-y-16 md:space-y-20">
-      <header className="relative space-y-8 pt-4 xl:pt-6">
+      <header data-route-enter className="relative space-y-8 pt-4 xl:pt-6">
         <div
           className="theme-border-faint absolute -left-8 top-0 hidden size-20 border-4 xl:block"
           style={{
             backgroundColor:
-              'color-mix(in srgb, var(--line-faint) 48%, transparent)',
+              "color-mix(in srgb, var(--line-faint) 48%, transparent)",
           }}
         />
         <div className="space-y-4">
-          <p className="manga-label theme-text-muted">Article Detail // Markdown</p>
+          <p className="manga-label theme-text-muted">
+            Article Detail // Markdown
+          </p>
           <div className="flex flex-wrap items-center gap-3">
             <Badge variant="ink">{pageData.post.categoryLabel}</Badge>
             <Badge variant="outlineInk">{pageData.readingTimeText}</Badge>
@@ -323,12 +372,12 @@ export function PostDetailPage(): ReactElement {
         </div>
       </header>
 
-      <section className="space-y-8">
+      <section data-route-enter className="space-y-8">
         <Card className="theme-surface-panel theme-border-strong overflow-hidden border-4 py-0 manga-panel">
           <CardContent className="grid gap-0 p-0 lg:grid-cols-[minmax(0,1.4fr)_320px]">
             <div
               className={cn(
-                'theme-border-strong relative overflow-hidden border-b-4 lg:aspect-auto lg:border-r-4 lg:border-b-0',
+                "theme-border-strong relative overflow-hidden border-b-4 lg:aspect-auto lg:border-r-4 lg:border-b-0",
                 getPostCoverRatioClass(pageData.post.coverRatio),
               )}
             >
@@ -348,10 +397,13 @@ export function PostDetailPage(): ReactElement {
                   本章线索
                 </h2>
                 <p className="theme-text-soft text-sm leading-7">
-                  这里延续归档页里的分节信息，让读者先知道文章会聊什么，再进入下面的 Markdown 正文。
+                  这里延续归档页里的分节信息，让读者先知道文章会聊什么，再进入下面的
+                  Markdown 正文。
                 </p>
               </div>
-              <ul className="space-y-4">{renderStorySeedItems(pageData.post)}</ul>
+              <ul className="space-y-4">
+                {renderStorySeedItems(pageData.post)}
+              </ul>
               <div className="grid gap-3 sm:grid-cols-2">
                 {renderArticleFactItems(pageData.post)}
               </div>
@@ -365,7 +417,10 @@ export function PostDetailPage(): ReactElement {
         </Card>
       </section>
 
-      <section className="grid gap-10 xl:grid-cols-[minmax(0,1fr)_300px]">
+      <section
+        data-route-enter
+        className="grid gap-10 xl:grid-cols-[minmax(0,1fr)_300px]"
+      >
         <div className="space-y-10">
           <Card className="theme-surface-panel theme-border-strong w-full border-4 py-0 manga-panel">
             <CardContent className="space-y-6 p-8 md:p-10">
@@ -425,7 +480,12 @@ export function PostDetailPage(): ReactElement {
                   </Link>
                 </Button>
                 {pageData.nextPost ? (
-                  <Button asChild variant="outlineInk" size="lg" className="w-full">
+                  <Button
+                    asChild
+                    variant="outlineInk"
+                    size="lg"
+                    className="w-full"
+                  >
                     <Link to={pageData.nextPost.to}>
                       继续阅读
                       <ArrowRight className="size-4" />
@@ -438,7 +498,10 @@ export function PostDetailPage(): ReactElement {
         </aside>
       </section>
 
-      <section className="theme-border-strong space-y-8 border-t-8 pt-10">
+      <section
+        data-route-enter
+        className="theme-border-strong space-y-8 border-t-8 pt-10"
+      >
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div className="space-y-2">
             <p className="manga-label theme-text-muted">Next Panels</p>
@@ -455,5 +518,5 @@ export function PostDetailPage(): ReactElement {
         </div>
       </section>
     </div>
-  )
+  );
 }

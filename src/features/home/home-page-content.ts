@@ -7,15 +7,30 @@ import type { HomePageStaticContent } from '@/shared/types/content'
  */
 export const homePageContent: HomePageStaticContent = {
   hero: {
-    speechBubble: 'Hello_World',
-    titleLead: '欢迎来到',
-    titleHighlight: '星码绽放',
-    description:
-      '这里是代码、漫画感视觉和极客生活方式交汇的地方。页面保留强风格表达，同时把内容层独立出来，便于后续复刻成别的站点。',
+    greeting: 'HELLO_WORLD',
+    name: '望月屋',
+    signature: '写代码、做内容，也把生活做成分镜。',
+    location: 'Shanghai, CN',
     avatar: {
       src: getPublicAssetUrl('mp4/头像.mp4'),
       alt: '黑白漫画风格的站点头像视频',
     },
+    profileLinks: [
+      {
+        label: 'GitHub',
+        to: 'https://github.com',
+        icon: 'github',
+        ariaLabel: '打开 GitHub 主页',
+        external: true,
+      },
+      {
+        label: 'Steam',
+        to: 'https://steamcommunity.com/profiles/76561198811570805/',
+        icon: 'steam',
+        ariaLabel: '打开 Steam 社区主页',
+        external: true,
+      },
+    ],
     actions: [
       { label: '开始浏览', to: '/posts', variant: 'ink' },
       { label: '了解更多', to: '/about', variant: 'outlineInk' },

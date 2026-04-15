@@ -6,24 +6,24 @@ import {
   type CSSProperties,
   type MouseEvent,
   type ReactElement,
-} from 'react'
-import { Menu, MoonStar, Palette, RotateCcw, SunMedium } from 'lucide-react'
-import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
+} from "react";
+import { Menu, MoonStar, Palette, RotateCcw, SunMedium } from "lucide-react";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 
 import {
   extractAnchorTarget,
   savePendingAnchorTarget,
   scrollToAnchorTarget,
-} from '@/shared/lib/anchor-scroll'
-import { getSiteIcon } from '@/shared/lib/site-icons'
-import { cn } from '@/shared/lib/utils'
-import { useTheme } from '@/shared/site/theme-provider'
+} from "@/shared/lib/anchor-scroll";
+import { getSiteIcon } from "@/shared/lib/site-icons";
+import { cn } from "@/shared/lib/utils";
+import { useTheme } from "@/shared/site/theme-provider";
 import type {
   NavigationLink,
   SiteConfig,
   SiteQuickAction,
-} from '@/shared/types/content'
-import { Button } from '@/shared/ui/button'
+} from "@/shared/types/content";
+import { Button } from "@/shared/ui/button";
 import {
   Sheet,
   SheetClose,
@@ -32,21 +32,21 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from '@/shared/ui/sheet'
+} from "@/shared/ui/sheet";
 
 interface SiteHeaderProps {
-  config: SiteConfig
+  config: SiteConfig;
 }
 
 function isDesktopNavigationItemActive(
   currentPathname: string,
   itemTo: string,
 ): boolean {
-  if (itemTo === '/') {
-    return currentPathname === '/'
+  if (itemTo === "/") {
+    return currentPathname === "/";
   }
 
-  return currentPathname === itemTo || currentPathname.startsWith(`${itemTo}/`)
+  return currentPathname === itemTo || currentPathname.startsWith(`${itemTo}/`);
 }
 
 function renderDesktopNavigationItems(
@@ -54,10 +54,10 @@ function renderDesktopNavigationItems(
   currentPathname: string,
   setItemRef: (to: string, element: HTMLAnchorElement | null) => void,
 ): ReactElement[] {
-  const elements: ReactElement[] = []
+  const elements: ReactElement[] = [];
 
   for (const item of navigation) {
-    const isActive = isDesktopNavigationItemActive(currentPathname, item.to)
+    const isActive = isDesktopNavigationItemActive(currentPathname, item.to);
 
     elements.push(
       <NavLink
@@ -65,50 +65,45 @@ function renderDesktopNavigationItems(
         to={item.to}
         ref={(element) => setItemRef(item.to, element)}
         className={cn(
-          'relative px-1 pb-2 font-heading text-base font-black uppercase tracking-[0.18em] transition-[transform,opacity] duration-300',
+          "relative px-1 pb-2 font-heading text-base font-black uppercase tracking-[0.18em] transition-[transform,opacity] duration-300",
           isActive
-            ? 'theme-text-strong opacity-100'
-            : 'theme-text-soft opacity-100 hover:opacity-100 hover:skew-x-[-8deg]',
+            ? "theme-text-strong opacity-100"
+            : "theme-text-soft opacity-100 hover:opacity-100 hover:skew-x-[-8deg]",
         )}
       >
         {item.label}
       </NavLink>,
-    )
+    );
   }
 
-  return elements
+  return elements;
 }
 
 function buildThemeSliderTrack(colors: readonly string[]): string {
   if (colors.length === 1) {
-    return colors[0]
+    return colors[0];
   }
 
   return `linear-gradient(90deg, ${colors
-    .map(
-      (color, index) =>
-        `${color} ${(index / (colors.length - 1)) * 100}%`,
-    )
-    .join(', ')})`
+    .map((color, index) => `${color} ${(index / (colors.length - 1)) * 100}%`)
+    .join(", ")})`;
 }
 
 function getThemeSliderStyle(track: string): CSSProperties {
   return {
-    ['--theme-slider-track' as '--theme-slider-track']: track,
-  }
+    ["--theme-slider-track"]: track,
+  } as CSSProperties;
 }
 
 function getMobileNavigationLinkClassName({
   isActive,
 }: {
-  isActive: boolean
+  isActive: boolean;
 }): string {
   return cn(
-    'block border-b-2 px-4 py-4 font-heading text-lg font-black uppercase tracking-[0.2em] transition-colors theme-border',
-    isActive
-      ? 'theme-ink-surface'
-      : 'theme-paper-surface hover:bg-secondary',
-  )
+    "block border-b-2 px-4 py-4 font-heading text-lg font-black uppercase tracking-[0.2em] transition-colors theme-border",
+    isActive ? "theme-ink-surface" : "theme-paper-surface hover:bg-secondary",
+  );
 }
 
 function renderQuickActionItems(
@@ -118,10 +113,10 @@ function renderQuickActionItems(
     action: SiteQuickAction,
   ) => void,
 ): ReactElement[] {
-  const elements: ReactElement[] = []
+  const elements: ReactElement[] = [];
 
   for (const action of actions) {
-    const Icon = getSiteIcon(action.icon)
+    const Icon = getSiteIcon(action.icon);
 
     elements.push(
       <Button
@@ -139,155 +134,160 @@ function renderQuickActionItems(
           <Icon className="size-5" />
         </Link>
       </Button>,
-    )
+    );
   }
 
-  return elements
+  return elements;
 }
 
 function renderMobileNavigationItems(
   navigation: NavigationLink[],
 ): ReactElement[] {
-  const elements: ReactElement[] = []
+  const elements: ReactElement[] = [];
 
   for (const item of navigation) {
     elements.push(
       <SheetClose key={item.to} asChild>
         <NavLink
           to={item.to}
-          className={({ isActive }) => getMobileNavigationLinkClassName({ isActive })}
+          className={({ isActive }) =>
+            getMobileNavigationLinkClassName({ isActive })
+          }
         >
           {item.label}
         </NavLink>
       </SheetClose>,
-    )
+    );
   }
 
-  return elements
+  return elements;
 }
 
 export function SiteHeader({ config }: SiteHeaderProps): ReactElement {
-  const navigate = useNavigate()
-  const location = useLocation()
+  const navigate = useNavigate();
+  const location = useLocation();
   const {
     theme,
-    paperToneIndex,
-    inkToneIndex,
-    paperToneLabel,
-    inkToneLabel,
-    paperToneOptions,
-    inkToneOptions,
+    resolvedTheme,
+    hue,
+    contrastToneIndex,
+    contrastToneLabel,
+    contrastToneOptions,
     paperColor,
     inkColor,
     toggleTheme,
-    setPaperToneIndex,
-    setInkToneIndex,
+    setHue,
+    setContrastToneIndex,
     resetThemeColors,
-  } = useTheme()
-  const [isPaletteOpen, setIsPaletteOpen] = useState(false)
-  const navigationRef = useRef<HTMLDivElement | null>(null)
-  const navigationIndicatorRef = useRef<HTMLDivElement | null>(null)
-  const navigationItemRefs = useRef<Record<string, HTMLAnchorElement | null>>({})
-  const palettePanelRef = useRef<HTMLDivElement | null>(null)
+  } = useTheme();
+  const themeHueColor = `oklch(0.72 0.08 ${hue})`;
+  const compatibleColor = resolvedTheme === "dark" ? paperColor : inkColor;
+  const [isPaletteOpen, setIsPaletteOpen] = useState(false);
+  const navigationRef = useRef<HTMLDivElement | null>(null);
+  const navigationIndicatorRef = useRef<HTMLDivElement | null>(null);
+  const navigationItemRefs = useRef<Record<string, HTMLAnchorElement | null>>(
+    {},
+  );
+  const palettePanelRef = useRef<HTMLDivElement | null>(null);
 
   function setNavigationItemRef(
     to: string,
     element: HTMLAnchorElement | null,
   ): void {
-    navigationItemRefs.current[to] = element
+    navigationItemRefs.current[to] = element;
   }
 
   useLayoutEffect(() => {
-    const navigationElement = navigationRef.current
-    const indicatorElement = navigationIndicatorRef.current
+    const navigationElement = navigationRef.current;
+    const indicatorElement = navigationIndicatorRef.current;
 
     if (!navigationElement || !indicatorElement) {
-      return
+      return;
     }
 
     const activeItem = config.navigation.find((item) =>
       isDesktopNavigationItemActive(location.pathname, item.to),
-    )
+    );
 
     if (!activeItem) {
-      indicatorElement.style.opacity = '0'
-      return
+      indicatorElement.style.opacity = "0";
+      return;
     }
 
-    const activeElement = navigationItemRefs.current[activeItem.to]
+    const activeElement = navigationItemRefs.current[activeItem.to];
 
     if (!activeElement) {
-      indicatorElement.style.opacity = '0'
-      return
+      indicatorElement.style.opacity = "0";
+      return;
     }
 
-    const navigationRect = navigationElement.getBoundingClientRect()
-    const activeRect = activeElement.getBoundingClientRect()
+    const navigationRect = navigationElement.getBoundingClientRect();
+    const activeRect = activeElement.getBoundingClientRect();
 
-    indicatorElement.style.opacity = '1'
-    indicatorElement.style.width = `${activeRect.width}px`
-    indicatorElement.style.transform = `translateX(${activeRect.left - navigationRect.left}px)`
-  }, [config.navigation, location.pathname])
+    indicatorElement.style.opacity = "1";
+    indicatorElement.style.width = `${activeRect.width}px`;
+    indicatorElement.style.transform = `translateX(${activeRect.left - navigationRect.left}px)`;
+  }, [config.navigation, location.pathname]);
 
   useEffect(() => {
-    const indicatorElement = navigationIndicatorRef.current
+    const indicatorElement = navigationIndicatorRef.current;
 
     if (!indicatorElement) {
-      return
+      return;
     }
 
     indicatorElement.style.transition =
-      'transform 280ms cubic-bezier(0.22, 1, 0.36, 1), width 280ms cubic-bezier(0.22, 1, 0.36, 1), opacity 180ms ease-out'
-  }, [])
+      "transform 280ms cubic-bezier(0.22, 1, 0.36, 1), width 280ms cubic-bezier(0.22, 1, 0.36, 1), opacity 180ms ease-out";
+  }, []);
 
   useEffect(() => {
     if (!isPaletteOpen) {
-      return
+      return;
     }
 
     function handlePointerDown(event: PointerEvent): void {
-      const palettePanelElement = palettePanelRef.current
+      const palettePanelElement = palettePanelRef.current;
 
       if (!palettePanelElement) {
-        return
+        return;
       }
 
       if (palettePanelElement.contains(event.target as Node)) {
-        return
+        return;
       }
 
-      setIsPaletteOpen(false)
+      setIsPaletteOpen(false);
     }
 
-    window.addEventListener('pointerdown', handlePointerDown)
+    window.addEventListener("pointerdown", handlePointerDown);
 
     return () => {
-      window.removeEventListener('pointerdown', handlePointerDown)
-    }
-  }, [isPaletteOpen])
+      window.removeEventListener("pointerdown", handlePointerDown);
+    };
+  }, [isPaletteOpen]);
 
   function handleQuickActionClick(
     event: MouseEvent<HTMLAnchorElement>,
     action: SiteQuickAction,
   ): void {
-    const anchorTarget = extractAnchorTarget(action.to)
+    const anchorTarget = extractAnchorTarget(action.to);
 
     if (!anchorTarget) {
-      return
+      return;
     }
 
-    event.preventDefault()
+    event.preventDefault();
 
-    if (location.pathname === '/') {
-      const nextUrl = `${window.location.pathname}${window.location.search}#${anchorTarget}`
+    if (location.pathname === "/") {
+      const nextUrl = `${window.location.pathname}${window.location.search}#${anchorTarget}`;
 
-      window.history.replaceState(null, '', nextUrl)
-      scrollToAnchorTarget(anchorTarget)
-      return
+      window.history.replaceState(null, "", nextUrl);
+      scrollToAnchorTarget(anchorTarget);
+      return;
     }
 
-    savePendingAnchorTarget(anchorTarget)
-    navigate('/')
+    savePendingAnchorTarget(anchorTarget);
+    navigate("/");
   }
 
   return (
@@ -298,18 +298,21 @@ export function SiteHeader({ config }: SiteHeaderProps): ReactElement {
             to="/"
             className="-rotate-1 whitespace-nowrap px-3 py-1 font-heading text-base leading-none font-black uppercase tracking-tight transition-transform hover:-translate-y-0.5 sm:text-lg md:text-xl"
             style={{
-              border: '4px solid var(--line-strong)',
+              border: "4px solid var(--line-strong)",
               backgroundColor:
-                'color-mix(in srgb, var(--surface-panel) 88%, transparent)',
-              color: 'var(--copy-strong)',
+                "color-mix(in srgb, var(--surface-panel) 88%, transparent)",
+              color: "var(--copy-strong)",
               boxShadow:
-                '4px 4px 0 0 color-mix(in srgb, var(--surface-ink) 8%, transparent)',
+                "4px 4px 0 0 color-mix(in srgb, var(--surface-ink) 8%, transparent)",
             }}
           >
-            {config.brand.primaryLabel} // {config.brand.secondaryLabel}
+            {config.brand.primaryLabel}
           </Link>
 
-          <div ref={navigationRef} className="relative hidden items-center gap-8 md:flex">
+          <div
+            ref={navigationRef}
+            className="relative hidden items-center gap-8 md:flex"
+          >
             {renderDesktopNavigationItems(
               config.navigation,
               location.pathname,
@@ -327,10 +330,12 @@ export function SiteHeader({ config }: SiteHeaderProps): ReactElement {
               variant="iconInk"
               size="icon"
               className="size-11"
-              aria-label={theme === 'light' ? '切换到夜间模式' : '切换到日间模式'}
+              aria-label={
+                theme === "light" ? "切换到夜间模式" : "切换到日间模式"
+              }
               onClick={toggleTheme}
             >
-              {theme === 'light' ? (
+              {theme === "light" ? (
                 <MoonStar className="size-5" />
               ) : (
                 <SunMedium className="size-5" />
@@ -375,28 +380,33 @@ export function SiteHeader({ config }: SiteHeaderProps): ReactElement {
                     <div className="flex items-center justify-between gap-3">
                       <div>
                         <p className="font-heading text-xs font-black uppercase tracking-[0.16em]">
-                          Paper Tone
+                          Theme Hue
                         </p>
-                        <p className="theme-text-muted text-xs">{paperToneLabel}</p>
+                        <p className="theme-text-muted text-xs">
+                          {hue}
+                        </p>
                       </div>
                       <div className="theme-surface-panel-muted theme-border-soft min-w-14 border-2 px-3 py-2 text-center font-heading text-xs font-black uppercase tracking-[0.12em]">
-                        {paperToneIndex}
+                        {hue}
                       </div>
                     </div>
                     <input
                       type="range"
                       min={0}
-                      max={paperToneOptions.length - 1}
+                      max={360}
                       step={1}
-                      value={paperToneIndex}
-                      aria-label="调整纸面色阶"
+                      value={hue}
+                      aria-label="调整主题色相"
                       onChange={(event) =>
-                        setPaperToneIndex(Number.parseInt(event.target.value, 10))
+                        setHue(Number.parseInt(event.target.value, 10))
                       }
                       className="theme-slider"
                       style={getThemeSliderStyle(
                         buildThemeSliderTrack(
-                          paperToneOptions.map((option) => option.value),
+                          Array.from({ length: 13 }, (_, index) => {
+                            const hueStop = index * 30;
+                            return `oklch(0.72 0.08 ${hueStop})`;
+                          }),
                         ),
                       )}
                     />
@@ -406,28 +416,35 @@ export function SiteHeader({ config }: SiteHeaderProps): ReactElement {
                     <div className="flex items-center justify-between gap-3">
                       <div>
                         <p className="font-heading text-xs font-black uppercase tracking-[0.16em]">
-                          Ink Tone
+                          Contrast Tone
                         </p>
-                        <p className="theme-text-muted text-xs">{inkToneLabel}</p>
+                        <p className="theme-text-muted text-xs">
+                          {contrastToneLabel}
+                        </p>
                       </div>
                       <div className="theme-surface-panel-muted theme-border-soft min-w-14 border-2 px-3 py-2 text-center font-heading text-xs font-black uppercase tracking-[0.12em]">
-                        {inkToneIndex}
+                        {contrastToneIndex}
                       </div>
                     </div>
                     <input
                       type="range"
                       min={0}
-                      max={inkToneOptions.length - 1}
+                      max={contrastToneOptions.length - 1}
                       step={1}
-                      value={inkToneIndex}
-                      aria-label="调整墨色深度"
+                      value={contrastToneIndex}
+                      aria-label="调整对比色阶"
                       onChange={(event) =>
-                        setInkToneIndex(Number.parseInt(event.target.value, 10))
+                        setContrastToneIndex(
+                          Number.parseInt(event.target.value, 10),
+                        )
                       }
                       className="theme-slider"
                       style={getThemeSliderStyle(
                         buildThemeSliderTrack(
-                          inkToneOptions.map((option) => option.value),
+                          contrastToneOptions.map(
+                            (option) =>
+                              `oklch(${option.ink.lightness} ${option.ink.chroma} ${hue})`,
+                          ),
                         ),
                       )}
                     />
@@ -436,18 +453,21 @@ export function SiteHeader({ config }: SiteHeaderProps): ReactElement {
                   <div className="grid grid-cols-2 gap-3">
                     <div
                       className="theme-border-soft h-12 border-2"
-                      style={{ backgroundColor: paperColor }}
+                      style={{ backgroundColor: themeHueColor }}
                     />
                     <div
                       className="theme-border-soft h-12 border-2"
-                      style={{ backgroundColor: inkColor }}
+                      style={{ backgroundColor: compatibleColor }}
                     />
                   </div>
                 </div>
               ) : null}
             </div>
 
-            {renderQuickActionItems(config.quickActions, handleQuickActionClick)}
+            {renderQuickActionItems(
+              config.quickActions,
+              handleQuickActionClick,
+            )}
 
             <Sheet>
               <SheetTrigger asChild>
@@ -481,5 +501,5 @@ export function SiteHeader({ config }: SiteHeaderProps): ReactElement {
         </div>
       </div>
     </header>
-  )
+  );
 }

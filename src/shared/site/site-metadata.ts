@@ -6,12 +6,13 @@
  * 避免 `index.html`、运行时脚本和页面配置各自维护一套标题与静态资源路径。
  */
 export const siteMetadata = {
-  title: 'KawaiiTech | 星码绽放',
-  description: '黑白漫画科技风的个人博客，记录游戏、技术与创作过程。',
-  siteUrl: 'https://example.com',
-  language: 'zh',
-  faviconPath: 'favicon.ico',
-} as const
+  title: "KawaiiTech | 星码绽放",
+  description: "黑白漫画科技风的个人博客，记录游戏、技术与创作过程。",
+  siteUrl: "https://example.com",
+  language: "zh",
+  faviconPath: "favicon.ico",
+  defaultOgImage: "/images/og-default.jpg", // 默认 Open Graph 图片
+} as const;
 
 /**
  * 根据部署基路径和 public 资源相对路径，生成最终可访问的静态资源 URL。
@@ -25,8 +26,8 @@ export function resolvePublicAssetPath(
   baseUrl: string,
   assetPath: string,
 ): string {
-  const normalizedBaseUrl = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`
-  const normalizedAssetPath = assetPath.replace(/^\/+/, '')
+  const normalizedBaseUrl = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
+  const normalizedAssetPath = assetPath.replace(/^\/+/, "");
 
-  return `${normalizedBaseUrl}${normalizedAssetPath}`
+  return `${normalizedBaseUrl}${normalizedAssetPath}`;
 }

@@ -1,220 +1,418 @@
-import { gsap } from 'gsap'
+import { gsap } from "gsap";
 import {
   useLayoutEffect,
   useRef,
-  type CSSProperties,
+  useState,
   type ReactElement,
-} from 'react'
-import { Outlet, useLocation } from 'react-router-dom'
+} from "react";
+import { Outlet, useLocation } from "react-router-dom";
 
-import { HashScrollHandler } from '@/shared/components/site/hash-scroll-handler'
-import { InteractiveDotBackground } from '@/shared/components/site/interactive-dot-background'
-import { SiteFooter } from '@/shared/components/site/site-footer'
-import { SiteHeader } from '@/shared/components/site/site-header'
-import { resolveRouteScene } from '@/shared/site/route-scene-config'
-import { siteConfig } from '@/shared/site/site-config'
+import { BannerCrossfadeMarquee } from "@/shared/site/banner-crossfade-marquee";
+import { DynamicIslandHeader } from "@/shared/components/site/dynamic-island-header";
+import { HashScrollHandler } from "@/shared/components/site/hash-scroll-handler";
+import { InteractiveDotBackground } from "@/shared/components/site/interactive-dot-background";
+import { SiteFooter } from "@/shared/components/site/site-footer";
+import { cn } from "@/shared/lib/utils";
+import { endRouteTransition, installMotionPerf, logLastTransition, startRouteTransition } from "@/shared/motion/motion-perf";
+import { MotionPerfHud } from "@/shared/motion/motion-perf-hud";
+import { motionTokens } from "@/shared/motion/motion-tokens";
+import { resolveRouteScene } from "@/shared/site/route-scene-config";
+import { siteConfig } from "@/shared/site/site-config";
 
-function getRouteBannerHeightStyle(isHomeScene: boolean): CSSProperties {
-  return {
-    height: isHomeScene ? 'min(68vh, 760px)' : 'min(34vh, 420px)',
+const COLLAPSED_BANNER_HEIGHT = "min(58.8vh, 728px)";
+const BANNER_IMAGE_SAFE_BLEED_RATIO = 0.12;
+
+function shouldPinBanner(pathname: string): boolean {
+  return pathname === "/";
+}
+
+function getRouteBannerHeightStyle(isFullBanner: boolean): {
+  height: "100svh" | typeof COLLAPSED_BANNER_HEIGHT;
+} {
+  return { height: isFullBanner ? "100svh" : COLLAPSED_BANNER_HEIGHT };
+}
+
+function getRouteBannerHeightPx(isFullBanner: boolean): number {
+  const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+
+  if (isFullBanner) {
+    return viewportHeight;
   }
+
+  return Math.min(viewportHeight * 0.588, 728);
+}
+
+function getRouteBannerParallaxOffset({
+  currentIsFullBanner,
+  targetIsFullBanner,
+}: {
+  currentIsFullBanner: boolean;
+  targetIsFullBanner: boolean;
+}): number {
+  if (currentIsFullBanner && !targetIsFullBanner) {
+    return motionTokens.parallax.homeToInnerY;
+  }
+
+  if (!currentIsFullBanner && targetIsFullBanner) {
+    return motionTokens.parallax.innerToHomeY;
+  }
+
+  return 0;
+}
+
+function clampRouteBannerParallaxOffset(
+  offset: number,
+  containerHeight: number,
+): number {
+  const safeTravel = Math.max(
+    0,
+    Math.round(containerHeight * BANNER_IMAGE_SAFE_BLEED_RATIO),
+  );
+
+  return Math.max(-safeTravel, Math.min(safeTravel, offset));
+}
+
+function interpolate(from: number, to: number, progress: number): number {
+  return from + (to - from) * progress;
+}
+
+/**
+ * 收集当前路由内容里需要参与入场动画的块级元素。
+ * 优先取一层子节点，避免把深层文本节点或装饰节点都卷进动画，导致节奏发散。
+ */
+function collectRouteEnterElements(
+  containerElement: HTMLDivElement,
+): HTMLElement[] {
+  const directChildren = Array.from(containerElement.children).filter(
+    (element): element is HTMLElement => element instanceof HTMLElement,
+  );
+
+  if (directChildren.length > 0) {
+    const elements: HTMLElement[] = [];
+
+    for (const child of directChildren) {
+      const markedElements = Array.from(
+        child.querySelectorAll("[data-route-enter]"),
+      ).filter(
+        (element): element is HTMLElement => element instanceof HTMLElement,
+      );
+
+      if (markedElements.length > 0) {
+        elements.push(...markedElements);
+        continue;
+      }
+
+      elements.push(child);
+    }
+
+    return elements;
+  }
+
+  return [containerElement];
+}
+
+/**
+ * 在降低动态效果时，直接把所有目标元素设回最终状态。
+ * 这样可以保留布局结构，不会因为跳过动画而出现透明残留或位移错位。
+ */
+function applyReducedMotionState(elements: HTMLElement[]): void {
+  gsap.set(elements, {
+    autoAlpha: 1,
+    y: 0,
+    clearProps: "transform,opacity,visibility",
+  });
+}
+
+/**
+ * 为当前路由执行分层入场动画。
+ * 整体策略参考 `fuwari`：不做整屏遮罩，只让横幅和内容块按顺序轻量进入。
+ */
+function playRouteEnterAnimation({
+  bannerMediaElement,
+  routeContentElement,
+  hasAnimated,
+}: {
+  bannerMediaElement: HTMLImageElement;
+  routeContentElement: HTMLDivElement;
+  hasAnimated: boolean;
+}): gsap.core.Timeline {
+  const routeEnterElements = collectRouteEnterElements(routeContentElement);
+  const timeline = gsap.timeline();
+  const bannerMediaStartScale = hasAnimated ? 1.02 : 1.04;
+  const routeContentStartY = hasAnimated ? 26 : 34;
+
+  gsap.set(bannerMediaElement, { scale: bannerMediaStartScale });
+  gsap.set(routeContentElement, { y: 0 });
+  gsap.set(routeEnterElements, { autoAlpha: 0, y: routeContentStartY });
+
+  timeline
+    .to(bannerMediaElement, {
+      scale: 1,
+      duration: hasAnimated
+        ? motionTokens.duration.bannerScale
+        : motionTokens.duration.bannerScaleInitial,
+      ease: motionTokens.ease.out,
+    })
+    .to(
+      routeEnterElements,
+      {
+        autoAlpha: 1,
+        y: 0,
+        duration: hasAnimated
+          ? motionTokens.duration.routeEnter
+          : motionTokens.duration.routeEnterInitial,
+        stagger: motionTokens.stagger.routeEnter,
+        ease: motionTokens.ease.out,
+        clearProps: "transform,opacity,visibility",
+      },
+      hasAnimated ? motionTokens.delay.routeEnter : motionTokens.delay.routeEnterInitial,
+    );
+
+  return timeline;
 }
 
 export function SiteLayout(): ReactElement {
-  const location = useLocation()
-  const bannerFrameRef = useRef<HTMLDivElement | null>(null)
-  const bannerMediaRef = useRef<HTMLImageElement | null>(null)
-  const bannerContentRef = useRef<HTMLDivElement | null>(null)
-  const routeContentRef = useRef<HTMLDivElement | null>(null)
-  const routeCurtainRef = useRef<HTMLDivElement | null>(null)
-  const hasAnimatedRef = useRef(false)
-  const resolvedRouteScene = resolveRouteScene(location.pathname)
+  const location = useLocation();
+  const bannerFrameRef = useRef<HTMLDivElement | null>(null);
+  const bannerMediaRef = useRef<HTMLImageElement | null>(null);
+  const routeLayerRef = useRef<HTMLDivElement | null>(null);
+  const hasAnimatedRef = useRef(false);
+  const showPerfHud =
+    import.meta.env.DEV &&
+    new URLSearchParams(window.location.search).get("perf") === "1";
+  const previousPathnameRef = useRef(location.pathname);
+  const bannerHeightTweenRef = useRef<gsap.core.Tween | null>(null);
+  const bannerMediaTweenRef = useRef<gsap.core.Tween | null>(null);
+  const routeTimelineRef = useRef<gsap.core.Timeline | null>(null);
+  const activeRouteScene = resolveRouteScene(location.pathname);
+  const [bannerScenePathname, setBannerScenePathname] = useState(
+    location.pathname,
+  );
+  const [isBannerPinned, setIsBannerPinned] = useState(() =>
+    shouldPinBanner(location.pathname),
+  );
+  const resolvedRouteScene = resolveRouteScene(bannerScenePathname);
 
   useLayoutEffect(() => {
-    const bannerFrameElement = bannerFrameRef.current
-    const bannerMediaElement = bannerMediaRef.current
-    const bannerContentElement = bannerContentRef.current
-    const routeContentElement = routeContentRef.current
-    const routeCurtainElement = routeCurtainRef.current
+    const bannerFrameElement = bannerFrameRef.current;
+    const bannerMediaElement = bannerMediaRef.current;
+    const routeLayerElement = routeLayerRef.current;
 
-    if (
-      !bannerFrameElement ||
-      !bannerMediaElement ||
-      !bannerContentElement ||
-      !routeContentElement ||
-      !routeCurtainElement
-    ) {
-      return
+    if (!bannerFrameElement || !bannerMediaElement || !routeLayerElement) {
+      return;
     }
 
     const prefersReducedMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)',
-    ).matches
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    const previousPathname = previousPathnameRef.current;
+    const nextPathname = location.pathname;
+    const isRouteChange = previousPathname !== nextPathname;
+    const isLeavingHome = previousPathname === "/" && nextPathname !== "/";
+    const isReturningHome = previousPathname !== "/" && nextPathname === "/";
+    const previousScene = resolveRouteScene(previousPathname);
+    const nextScene = resolveRouteScene(nextPathname);
+    const routeEnterElements = collectRouteEnterElements(routeLayerElement);
 
+    routeTimelineRef.current?.kill();
+    bannerHeightTweenRef.current?.kill();
+    bannerMediaTweenRef.current?.kill();
     gsap.killTweensOf([
       bannerFrameElement,
       bannerMediaElement,
-      bannerContentElement,
-      routeContentElement,
-      routeCurtainElement,
-    ])
+      routeLayerElement,
+      ...routeEnterElements,
+    ]);
 
     if (prefersReducedMotion) {
-      gsap.set(routeCurtainElement, { autoAlpha: 0, scaleY: 0 })
-      gsap.set(bannerMediaElement, { scale: 1 })
-      gsap.set(bannerContentElement, { autoAlpha: 1, y: 0 })
-      gsap.set(routeContentElement, { autoAlpha: 1, y: 0 })
-      hasAnimatedRef.current = true
-      return
+      setBannerScenePathname(nextPathname);
+      setIsBannerPinned(shouldPinBanner(nextPathname));
+      bannerFrameElement.style.height = nextScene.isFullBanner
+        ? "100svh"
+        : COLLAPSED_BANNER_HEIGHT;
+      gsap.set(bannerMediaElement, {
+        scale: 1,
+        y: nextScene.isFullBanner ? 0 : -96,
+        clearProps: "transform,willChange",
+      });
+      gsap.set(routeLayerElement, { autoAlpha: 1, clearProps: "willChange" });
+      applyReducedMotionState(routeEnterElements);
+      previousPathnameRef.current = nextPathname;
+      hasAnimatedRef.current = true;
+      return;
     }
 
-    const timeline = gsap.timeline()
-
-    if (!hasAnimatedRef.current) {
-      gsap.set(routeCurtainElement, { autoAlpha: 0, scaleY: 0 })
-      gsap.set(bannerMediaElement, { scale: 1.06 })
-      gsap.set(bannerContentElement, { autoAlpha: 0, y: 26 })
-      gsap.set(routeContentElement, { autoAlpha: 0, y: 32 })
-
-      timeline
-        .to(bannerMediaElement, {
-          scale: 1,
-          duration: 0.85,
-          ease: 'power3.out',
-        })
-        .to(
-          bannerContentElement,
-          {
-            autoAlpha: 1,
-            y: 0,
-            duration: 0.45,
-            ease: 'power3.out',
-          },
-          0.12,
-        )
-        .to(
-          routeContentElement,
-          {
-            autoAlpha: 1,
-            y: 0,
-            duration: 0.52,
-            ease: 'power3.out',
-          },
-          0.18,
-        )
-
-      hasAnimatedRef.current = true
-      return () => {
-        timeline.kill()
-      }
-    }
-
-    gsap.set(routeCurtainElement, {
-      autoAlpha: 1,
-      scaleY: 1,
-      transformOrigin: 'top center',
-    })
-    gsap.set(bannerMediaElement, { scale: 1.05 })
-    gsap.set(bannerContentElement, { autoAlpha: 0, y: 20 })
-    gsap.set(routeContentElement, { autoAlpha: 0, y: 26 })
-
-    timeline
-      .to(routeCurtainElement, {
-        scaleY: 0,
-        transformOrigin: 'bottom center',
-        duration: 0.55,
-        ease: 'power4.out',
-      })
-      .to(
+    if (!isRouteChange) {
+      bannerFrameElement.style.height = nextScene.isFullBanner
+        ? "100svh"
+        : COLLAPSED_BANNER_HEIGHT;
+      gsap.set(routeLayerElement, {
+        autoAlpha: 1,
+        clearProps: "willChange",
+      });
+      applyReducedMotionState(routeEnterElements);
+      routeTimelineRef.current = playRouteEnterAnimation({
         bannerMediaElement,
-        {
-          scale: 1,
-          duration: 0.78,
-          ease: 'power3.out',
-        },
-        0.05,
-      )
-      .to(
-        bannerContentElement,
-        {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.42,
-          ease: 'power3.out',
-        },
-        0.16,
-      )
-      .to(
-        routeContentElement,
-        {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.5,
-          ease: 'power3.out',
-        },
-        0.22,
-      )
-      .set(routeCurtainElement, { autoAlpha: 0 })
+        routeContentElement: routeLayerElement,
+        hasAnimated: hasAnimatedRef.current,
+      });
+      hasAnimatedRef.current = true;
+
+      return () => {
+        routeTimelineRef.current?.kill();
+      };
+    }
+
+    if (import.meta.env.DEV) {
+      installMotionPerf("optimized");
+      startRouteTransition({ pathname: nextPathname, mode: "optimized" });
+    }
+
+    setIsBannerPinned(false);
+
+    const currentBannerHeight = bannerFrameElement.getBoundingClientRect().height;
+    const targetBannerHeight = getRouteBannerHeightPx(nextScene.isFullBanner);
+    const startBannerY = Number(gsap.getProperty(bannerMediaElement, "y")) || 0;
+    const rawTargetBannerY = getRouteBannerParallaxOffset({
+      currentIsFullBanner: previousScene.isFullBanner,
+      targetIsFullBanner: nextScene.isFullBanner,
+    });
+    const targetBannerY =
+      !previousScene.isFullBanner && !nextScene.isFullBanner
+        ? startBannerY
+        : clampRouteBannerParallaxOffset(rawTargetBannerY, targetBannerHeight);
+
+    bannerFrameElement.style.height = `${currentBannerHeight}px`;
+    gsap.set(routeLayerElement, {
+      autoAlpha: 0,
+      willChange: "opacity,transform",
+    });
+
+    bannerHeightTweenRef.current = gsap.to(bannerFrameElement, {
+      height: targetBannerHeight,
+      duration: motionTokens.duration.bannerResize,
+      ease: motionTokens.ease.inOut,
+      overwrite: true,
+      onUpdate: () => {
+        const tween = bannerHeightTweenRef.current;
+        const progress = tween?.progress() ?? 0;
+        const easedProgress = tween?.ratio ?? progress;
+
+        gsap.set(bannerMediaElement, {
+          y: interpolate(startBannerY, targetBannerY, easedProgress),
+        });
+
+        if (isLeavingHome && progress >= 0.72 && bannerScenePathname !== nextPathname) {
+          setBannerScenePathname(nextPathname);
+        }
+      },
+      onComplete: () => {
+        bannerFrameElement.style.height = nextScene.isFullBanner
+          ? "100svh"
+          : COLLAPSED_BANNER_HEIGHT;
+        if (bannerScenePathname !== nextPathname) {
+          setBannerScenePathname(nextPathname);
+        }
+        if (isReturningHome) {
+          setIsBannerPinned(true);
+        }
+      },
+    });
+    bannerMediaTweenRef.current = bannerHeightTweenRef.current;
+
+    routeTimelineRef.current = gsap.timeline({
+      delay: isReturningHome
+        ? motionTokens.duration.bannerResize
+        : motionTokens.duration.bannerResize * 0.55,
+      onComplete: () => {
+        gsap.set(routeLayerElement, { clearProps: "willChange" });
+        if (!isReturningHome) {
+          setIsBannerPinned(shouldPinBanner(nextPathname));
+        }
+        if (import.meta.env.DEV) {
+          const entry = endRouteTransition({ interrupted: false });
+          if (entry) {
+            logLastTransition();
+          }
+        }
+      },
+    });
+
+    routeTimelineRef.current.to(routeLayerElement, {
+      autoAlpha: 1,
+      duration: motionTokens.duration.fade,
+      ease: motionTokens.ease.inOut,
+      overwrite: "auto",
+    });
+
+    routeTimelineRef.current.add(
+      playRouteEnterAnimation({
+        bannerMediaElement,
+        routeContentElement: routeLayerElement,
+        hasAnimated: hasAnimatedRef.current,
+      }),
+      0,
+    );
+
+    previousPathnameRef.current = nextPathname;
+    hasAnimatedRef.current = true;
 
     return () => {
-      timeline.kill()
-    }
-  }, [location.pathname])
+      routeTimelineRef.current?.kill();
+      bannerHeightTweenRef.current?.kill();
+      bannerMediaTweenRef.current?.kill();
+    };
+  }, [location.pathname]);
 
   return (
     <div className="theme-surface-page relative isolate min-h-screen overflow-x-clip">
       <InteractiveDotBackground />
-      <SiteHeader config={siteConfig} />
+      <DynamicIslandHeader config={siteConfig} />
       <HashScrollHandler />
-
-      <div
-        ref={routeCurtainRef}
-        className="theme-surface-ink pointer-events-none fixed inset-x-0 top-0 z-40 h-screen origin-top"
-      />
 
       <section className="relative">
         <div
           ref={bannerFrameRef}
-          className="relative w-full overflow-hidden transition-[height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
-          style={getRouteBannerHeightStyle(resolvedRouteScene.isHomeScene)}
+          className={cn("relative w-full overflow-hidden")}
+          style={getRouteBannerHeightStyle(resolvedRouteScene.isFullBanner)}
         >
-          <img
-            ref={bannerMediaRef}
+          <BannerCrossfadeMarquee
+            mediaRef={bannerMediaRef}
             src={resolvedRouteScene.scene.image.src}
             alt={resolvedRouteScene.scene.image.alt}
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ objectPosition: resolvedRouteScene.scene.imagePosition }}
+            imagePosition={resolvedRouteScene.scene.imagePosition}
+            positionClassName={isBannerPinned ? "fixed" : "absolute"}
           />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,color-mix(in_srgb,var(--surface-panel)_94%,transparent)_0%,color-mix(in_srgb,var(--surface-panel)_78%,transparent)_24%,transparent_58%)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface-page)_8%,transparent)_0%,transparent_42%,color-mix(in_srgb,var(--surface-page)_30%,transparent)_100%)]" />
-          <div className="manga-halftone absolute -right-8 top-10 size-40 text-[color-mix(in_srgb,var(--surface-ink)_10%,transparent)]" />
-
           <div
-            ref={bannerContentRef}
-            className="site-shell relative z-10 flex h-full items-end px-4 pb-6 pt-28 md:px-6 md:pb-8 lg:pb-10"
-          >
-            <div className="theme-border-strong max-w-4xl space-y-4 border-4 bg-[color-mix(in_srgb,var(--surface-panel)_84%,transparent)] px-5 py-5 shadow-[10px_10px_0_0_var(--surface-ink)] backdrop-blur-[10px] md:px-7 md:py-6">
-              <p className="font-heading text-xs font-black uppercase tracking-[0.28em] text-[color-mix(in_srgb,var(--copy-base)_68%,transparent)]">
-                {resolvedRouteScene.scene.eyebrow}
-              </p>
-              <div className="flex flex-wrap items-end gap-3">
-                <h1 className="font-heading text-4xl font-black leading-none tracking-tight text-[var(--copy-base)] md:text-6xl">
-                  {resolvedRouteScene.scene.title}
-                </h1>
-                <span className="theme-surface-ink theme-border-strong mb-1 border-4 px-3 py-1 font-heading text-sm font-black uppercase tracking-[0.14em] text-[var(--copy-inverse)] md:text-base">
-                  {resolvedRouteScene.scene.emphasis}
-                </span>
-              </div>
-              <p className="max-w-3xl text-sm font-medium leading-7 text-[color-mix(in_srgb,var(--copy-base)_82%,transparent)] md:text-base md:leading-8">
-                {resolvedRouteScene.scene.description}
-              </p>
-            </div>
-          </div>
+            className={cn(
+              "pointer-events-none inset-0 bg-[linear-gradient(90deg,color-mix(in_srgb,var(--surface-panel)_94%,transparent)_0%,color-mix(in_srgb,var(--surface-panel)_78%,transparent)_24%,transparent_58%)]",
+              isBannerPinned ? "fixed" : "absolute",
+            )}
+          />
+          <div
+            className={cn(
+              "pointer-events-none inset-0 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--surface-page)_8%,transparent)_0%,transparent_42%,color-mix(in_srgb,var(--surface-page)_30%,transparent)_100%)]",
+              isBannerPinned ? "fixed" : "absolute",
+            )}
+          />
+          <div
+            className={cn(
+              "pointer-events-none manga-halftone -right-8 top-10 size-40 text-[color-mix(in_srgb,var(--surface-ink)_10%,transparent)]",
+              isBannerPinned ? "fixed" : "absolute",
+            )}
+          />
         </div>
       </section>
 
-      <main className="site-shell relative z-20 -mt-12 px-4 pb-20 md:-mt-[4.5rem] md:px-6">
-        <div ref={routeContentRef}>
+      <main
+        className={cn(
+          "site-shell relative z-20 px-4 pb-20 md:px-6",
+          activeRouteScene.isFullBanner
+            ? "-mt-12 md:-mt-[4.5rem]"
+            : "-mt-24 md:-mt-28 lg:-mt-32",
+        )}
+      >
+        <div ref={routeLayerRef}>
           <Outlet />
         </div>
       </main>
@@ -222,6 +420,8 @@ export function SiteLayout(): ReactElement {
       <div className="relative z-20">
         <SiteFooter config={siteConfig} />
       </div>
+
+      {showPerfHud ? <MotionPerfHud /> : null}
     </div>
-  )
+  );
 }

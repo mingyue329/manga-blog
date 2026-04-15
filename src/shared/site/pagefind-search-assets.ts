@@ -1,15 +1,19 @@
 import type { IndexFile } from 'pagefind'
 import { close, createIndex } from 'pagefind'
 
-import { getPostCategoryLabel } from '@/features/posts/article-derived-data'
-import { loadPublicMarkdownPostDocumentsFromFileSystem } from '@/shared/site/static-site-assets'
-import { siteMetadata } from '@/shared/site/site-metadata'
+import { getPostCategoryLabel } from '../../features/posts/article-derived-data'
+import { loadPublicMarkdownPostDocumentsFromFileSystem } from './static-site-assets'
+import { siteMetadata } from './site-metadata'
 
 interface PagefindSearchFile {
   path: string
   content: Uint8Array
 }
 
+/**
+ * 把 Markdown 内容压平成适合全文索引的纯文本。
+ * Pagefind 不需要保留展示语义，只需要稳定的可搜索文本。
+ */
 function stripMarkdown(markdownContent: string): string {
   return markdownContent
     .replace(/```[\s\S]*?```/gu, ' ')
@@ -22,10 +26,18 @@ function stripMarkdown(markdownContent: string): string {
     .trim()
 }
 
+/**
+ * 组合 Pagefind 使用的正文。
+ * 摘要和全文一起写入，可以兼顾搜索命中率与结果相关性。
+ */
 function buildSearchContent(markdownContent: string, excerpt: string): string {
   return [excerpt, stripMarkdown(markdownContent)].join('\n')
 }
 
+/**
+ * 规范化 Pagefind 输出文件路径。
+ * 这里会去掉工具默认加上的 `pagefind/` 前缀，便于后续统一挂载到 Vite 产物目录。
+ */
 function buildPagefindFiles(files: IndexFile[]): PagefindSearchFile[] {
   return files.map((file) => ({
     path: file.path.replace(/^pagefind[\\/]/u, ''),
@@ -33,6 +45,10 @@ function buildPagefindFiles(files: IndexFile[]): PagefindSearchFile[] {
   }))
 }
 
+/**
+ * 构建文章搜索索引文件。
+ * 索引生成发生在 Node 侧，因此这里全部依赖文件系统和共享内容解析逻辑。
+ */
 export async function buildPagefindSearchFiles(): Promise<PagefindSearchFile[]> {
   const { index, errors } = await createIndex({
     forceLanguage: siteMetadata.language,
@@ -108,6 +124,10 @@ export async function buildPagefindSearchFiles(): Promise<PagefindSearchFile[]> 
   }
 }
 
+/**
+ * 根据 Pagefind 文件后缀返回响应类型。
+ * 开发态通过中间件直接喂二进制内容时，需要自己补上正确的 Content-Type。
+ */
 export function getPagefindContentType(filePath: string): string {
   if (filePath.endsWith('.js')) {
     return 'application/javascript; charset=utf-8'

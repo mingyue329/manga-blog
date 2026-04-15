@@ -1,20 +1,20 @@
-import type { ReactElement } from 'react'
-import { ArrowRight } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import type { ReactElement } from "react";
+import { ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
-import { useGsapHoverPreviewCard } from '@/shared/lib/use-gsap-hover-preview-card'
-import { Badge } from '@/shared/ui/badge'
+import { useGsapHoverPreviewCard } from "@/shared/lib/use-gsap-hover-preview-card";
+import { Badge } from "@/shared/ui/badge";
 import {
   Card,
   CardContent,
   CardDescription,
   CardFooter,
   CardTitle,
-} from '@/shared/ui/card'
-import type { UpdateArticle, UpdatesSectionData } from '@/shared/types/content'
+} from "@/shared/ui/card";
+import type { UpdateArticle, UpdatesSectionData } from "@/shared/types/content";
 
 interface UpdatesSectionProps {
-  updates: UpdatesSectionData
+  updates: UpdatesSectionData;
 }
 
 /**
@@ -22,10 +22,15 @@ interface UpdatesSectionProps {
  */
 function UpdateCard({ item }: { item: UpdateArticle }): ReactElement {
   const { triggerRef, cardRef, shadowRef, imageRef, overlayRef } =
-    useGsapHoverPreviewCard()
+    useGsapHoverPreviewCard();
 
   return (
-    <Link ref={triggerRef} to={item.to} className="group block h-full">
+    <Link
+      ref={triggerRef as React.Ref<HTMLAnchorElement>}
+      to={item.to}
+      data-route-enter
+      className="group block h-full"
+    >
       <div className="relative h-full">
         <div
           ref={shadowRef}
@@ -71,20 +76,20 @@ function UpdateCard({ item }: { item: UpdateArticle }): ReactElement {
         </Card>
       </div>
     </Link>
-  )
+  );
 }
 
 /**
  * 渲染更新区卡片列表。
  */
 function renderUpdateCards(items: UpdateArticle[]): ReactElement[] {
-  const elements: ReactElement[] = []
+  const elements: ReactElement[] = [];
 
   for (const item of items) {
-    elements.push(<UpdateCard key={item.title} item={item} />)
+    elements.push(<UpdateCard key={item.title} item={item} />);
   }
 
-  return elements
+  return elements;
 }
 
 /**
@@ -93,7 +98,10 @@ function renderUpdateCards(items: UpdateArticle[]): ReactElement[] {
 export function UpdatesSection({ updates }: UpdatesSectionProps): ReactElement {
   return (
     <section className="space-y-8">
-      <div className="theme-border-strong flex flex-col gap-4 border-b-8 pb-3 md:flex-row md:items-end md:justify-between">
+      <div
+        data-route-enter
+        className="theme-border-strong flex flex-col gap-4 border-b-8 pb-3 md:flex-row md:items-end md:justify-between"
+      >
         <h2 className="manga-section-title italic">{updates.title}</h2>
         <Link
           to={updates.viewAllLink.to}
@@ -106,5 +114,5 @@ export function UpdatesSection({ updates }: UpdatesSectionProps): ReactElement {
         {renderUpdateCards(updates.items)}
       </div>
     </section>
-  )
+  );
 }

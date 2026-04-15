@@ -47,6 +47,10 @@ const buttonVariants = cva(
   },
 )
 
+/**
+ * 统一站点按钮组件。
+ * 这里集中管理按钮的视觉变体与基础动效，避免页面里重复拼交互细节。
+ */
 const Button = React.forwardRef<
   HTMLElement,
   React.ComponentProps<'button'> &
@@ -64,43 +68,92 @@ const Button = React.forwardRef<
       return
     }
 
+    const resolvedElement = element
+
     const prefersReducedMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)',
     ).matches
 
-    gsap.set(element, {
+    gsap.set(resolvedElement, {
       y: 0,
+      scale: 1,
       boxShadow: '0px 0px 0px 0px var(--surface-ink)',
     })
 
+    /**
+     * 处理鼠标进入动效。
+     * 按钮轻微抬起并出现硬边投影，和页面整体描边语言保持一致。
+     */
     function handlePointerEnter(): void {
-      gsap.to(element, {
+      gsap.to(resolvedElement, {
         y: prefersReducedMotion ? 0 : -2,
+        scale: 1,
         boxShadow: '4px 4px 0px 0px var(--surface-ink)',
         duration: prefersReducedMotion ? 0.01 : 0.2,
         ease: prefersReducedMotion ? 'none' : 'power2.out',
       })
     }
 
+    /**
+     * 处理鼠标离开动效。
+     * 离开后回到基础状态，避免按钮残留阴影与缩放。
+     */
     function handlePointerLeave(): void {
-      gsap.to(element, {
+      gsap.to(resolvedElement, {
         y: 0,
+        scale: 1,
         boxShadow: '0px 0px 0px 0px var(--surface-ink)',
         duration: prefersReducedMotion ? 0.01 : 0.18,
         ease: prefersReducedMotion ? 'none' : 'power2.out',
       })
     }
 
-    element.addEventListener('pointerenter', handlePointerEnter)
-    element.addEventListener('pointerleave', handlePointerLeave)
+    /**
+     * 处理按下动效。
+     * 按下时缩小一点，并把阴影收短，形成更明确的受压反馈。
+     */
+    function handlePointerDown(): void {
+      gsap.to(resolvedElement, {
+        scale: prefersReducedMotion ? 1 : 0.96,
+        boxShadow: '2px 2px 0px 0px var(--surface-ink)',
+        duration: prefersReducedMotion ? 0.01 : 0.12,
+        ease: prefersReducedMotion ? 'none' : 'power2.out',
+      })
+    }
+
+    /**
+     * 处理抬起动效。
+     * 如果指针还停留在按钮上，就回到 hover 态；否则完全复位。
+     */
+    function handlePointerUp(): void {
+      if (resolvedElement.matches(':hover')) {
+        handlePointerEnter()
+        return
+      }
+
+      handlePointerLeave()
+    }
+
+    resolvedElement.addEventListener('pointerenter', handlePointerEnter)
+    resolvedElement.addEventListener('pointerleave', handlePointerLeave)
+    resolvedElement.addEventListener('pointerdown', handlePointerDown)
+    resolvedElement.addEventListener('pointerup', handlePointerUp)
+    resolvedElement.addEventListener('pointercancel', handlePointerLeave)
 
     return () => {
-      element.removeEventListener('pointerenter', handlePointerEnter)
-      element.removeEventListener('pointerleave', handlePointerLeave)
-      gsap.killTweensOf(element)
+      resolvedElement.removeEventListener('pointerenter', handlePointerEnter)
+      resolvedElement.removeEventListener('pointerleave', handlePointerLeave)
+      resolvedElement.removeEventListener('pointerdown', handlePointerDown)
+      resolvedElement.removeEventListener('pointerup', handlePointerUp)
+      resolvedElement.removeEventListener('pointercancel', handlePointerLeave)
+      gsap.killTweensOf(resolvedElement)
     }
   }, [variant])
 
+  /**
+   * 同步内部节点引用与外部 forwarded ref。
+   * 组件内部需要绑定动效，外部也可能继续访问真实 DOM 节点。
+   */
   function handleRef(node: HTMLElement | null): void {
     internalRef.current = node
 

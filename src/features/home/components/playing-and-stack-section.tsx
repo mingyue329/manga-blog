@@ -1,29 +1,32 @@
-﻿import type { ReactElement } from 'react'
-import { Gamepad2 } from 'lucide-react'
+﻿import type { ReactElement } from "react";
+import { Gamepad2 } from "lucide-react";
 
-import { useGsapHoverLift } from '@/shared/lib/use-gsap-hover-preview-card'
-import { getSiteIcon } from '@/shared/lib/site-icons'
-import { Card, CardContent } from '@/shared/ui/card'
-import { Progress } from '@/shared/ui/progress'
+import { useGsapHoverLift } from "@/shared/lib/use-gsap-hover-preview-card";
+import { getSiteIcon } from "@/shared/lib/site-icons";
+import { Card, CardContent } from "@/shared/ui/card";
+import { Progress } from "@/shared/ui/progress";
 import type {
   PlayingSectionData,
   StackSectionData,
   TechStackItem,
-} from '@/shared/types/content'
+} from "@/shared/types/content";
 
 interface PlayingAndStackSectionProps {
-  playing: PlayingSectionData
-  stack: StackSectionData
+  playing: PlayingSectionData;
+  stack: StackSectionData;
 }
 
 /**
  * 娓叉煋鎶€鏈爤涓殑鍗曚釜鑳藉姏椤广€? * 鏁版嵁鍜屽浘鏍囦箣闂撮€氳繃缁熶竴鏄犲皠瑙ｈ€︼紝鏈潵鎹㈡垚鎺ュ彛椹卞姩鏃朵笉闇€瑕佹敼娓叉煋閫昏緫銆? */
 function StackItem({ item }: { item: TechStackItem }): ReactElement {
-  const Icon = getSiteIcon(item.icon)
-  const { triggerRef, targetRef } = useGsapHoverLift()
+  const Icon = getSiteIcon(item.icon);
+  const { triggerRef, targetRef } = useGsapHoverLift();
 
   return (
-    <div ref={triggerRef} className="flex flex-col items-center gap-3 text-center">
+    <div
+      ref={triggerRef as React.RefObject<HTMLDivElement>}
+      className="flex flex-col items-center gap-3 text-center"
+    >
       <div
         ref={targetRef}
         className="theme-surface-panel theme-border-strong flex size-18 items-center justify-center border-4"
@@ -32,19 +35,19 @@ function StackItem({ item }: { item: TechStackItem }): ReactElement {
       </div>
       <span className="text-xs font-black tracking-[0.2em]">{item.name}</span>
     </div>
-  )
+  );
 }
 
 /**
  * 娓叉煋鎶€鏈爤缃戞牸銆? */
 function renderStackItems(items: TechStackItem[]): ReactElement[] {
-  const elements: ReactElement[] = []
+  const elements: ReactElement[] = [];
 
   for (const item of items) {
-    elements.push(<StackItem key={item.name} item={item} />)
+    elements.push(<StackItem key={item.name} item={item} />);
   }
 
-  return elements
+  return elements;
 }
 
 /**
@@ -116,6 +119,5 @@ export function PlayingAndStackSection({
         </CardContent>
       </Card>
     </section>
-  )
+  );
 }
-
