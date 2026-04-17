@@ -8,7 +8,7 @@
 export const siteMetadata = {
   title: "明月几时有",
   description: "黑白漫画科技风的个人博客，记录游戏、技术与创作过程。",
-  siteUrl: "https://example.com",
+  siteUrl: "https://mingyue329.github.io/manga-blog",
   language: "zh",
   faviconPath: "favicon.ico",
   defaultOgImage: "/images/og-default.jpg", // 默认 Open Graph 图片

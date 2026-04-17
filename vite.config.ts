@@ -12,7 +12,11 @@ import {
   getPagefindContentType,
 } from "./src/shared/site/pagefind-search-assets";
 import { getSteamProfile as getFallbackSteamProfile } from "./src/features/steam/steam-content";
-import type { SteamApiConfig, SteamGameCard, SteamProfileSummary } from "./src/features/steam/steam-types";
+import type {
+  SteamApiConfig,
+  SteamGameCard,
+  SteamProfileSummary,
+} from "./src/features/steam/steam-types";
 import {
   buildRobotsTxt,
   buildRssXml,
@@ -328,7 +332,9 @@ function steamProfileApiPlugin(): Plugin {
             title: player.gameextrainfo,
             steamUrl: getSteamStoreUrl(currentGameAppId),
             coverImage: getSteamHeaderImageUrl(currentGameAppId),
-            playtimeHours: getPlaytimeHours(currentRecentGame?.playtime_forever),
+            playtimeHours: getPlaytimeHours(
+              currentRecentGame?.playtime_forever,
+            ),
             status: "playing" as const,
             note: currentRecentGame?.playtime_2weeks
               ? `最近两周 ${getPlaytimeHours(currentRecentGame.playtime_2weeks)} 小时`
@@ -373,10 +379,8 @@ function steamProfileApiPlugin(): Plugin {
         const baseUrl = server.config.base.endsWith("/")
           ? server.config.base
           : `${server.config.base}/`;
-        const normalizedApiPath = `${baseUrl}${apiPath.replace(/^\//, "")}`.replace(
-          /\/{2,}/g,
-          "/",
-        );
+        const normalizedApiPath =
+          `${baseUrl}${apiPath.replace(/^\//, "")}`.replace(/\/{2,}/g, "/");
 
         if (requestPath !== normalizedApiPath) {
           next();
@@ -404,7 +408,8 @@ function steamProfileApiPlugin(): Plugin {
           response.statusCode = 502;
           response.end(
             JSON.stringify({
-              error: error instanceof Error ? error.message : "Steam API failed",
+              error:
+                error instanceof Error ? error.message : "Steam API failed",
             }),
           );
         }
@@ -418,6 +423,7 @@ function steamProfileApiPlugin(): Plugin {
  * 这里集中管理别名、插件和 HTML 注入策略，让开发与构建共用同一套基础配置。
  */
 export default defineConfig({
+  base: "/manga-blog/",
   plugins: [
     react(),
     tailwindcss(),
