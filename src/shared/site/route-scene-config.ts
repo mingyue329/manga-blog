@@ -17,8 +17,8 @@ interface ResolvedRouteScene {
 }
 
 const sharedRouteSceneImage = {
-  src: getPublicAssetUrl("/mp4/常态背景.mp4"),
-  alt: "站点默认背景视频",
+  src: getPublicAssetUrl("/images/site/bac.png"),
+  alt: "黑白风格的人物侧脸横幅",
 } as const satisfies ImageAsset;
 
 const routeScenes = {
