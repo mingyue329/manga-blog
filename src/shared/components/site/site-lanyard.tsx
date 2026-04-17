@@ -14,6 +14,8 @@ import {
 import { MeshLineGeometry, MeshLineMaterial } from "meshline";
 import * as THREE from "three";
 
+import { getPublicAssetUrl } from "@/shared/lib/public-asset";
+
 extend({ MeshLineGeometry, MeshLineMaterial });
 
 declare module "@react-three/fiber" {
@@ -98,7 +100,9 @@ function LanyardBand({ isMobile }: { isMobile: boolean }): ReactElement {
     angularDamping: 6,
     linearDamping: 5,
   };
-  const { nodes, materials } = useGLTF("/card-BP4TWJmK.glb") as any;
+  const { nodes, materials } = useGLTF(
+    getPublicAssetUrl("card-BP4TWJmK.glb"),
+  ) as any;
 
   useRopeJoint(fixed, j1, [[0, 0, 0], [0, 0, 0], 1]);
   useRopeJoint(j1, j2, [[0, 0, 0], [0, 0, 0], 1]);
@@ -367,4 +371,4 @@ export function SiteLanyard({
   );
 }
 
-useGLTF.preload("/card-BP4TWJmK.glb");
+useGLTF.preload(import.meta.env.BASE_URL + "card-BP4TWJmK.glb");
