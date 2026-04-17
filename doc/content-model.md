@@ -8,30 +8,30 @@
 
 ### 必填字段
 
-| 字段 | 类型 | 说明 | 示例 |
-|------|------|------|------|
-| `title` | string | 文章标题 | `"黑神话：悟空评测"` |
-| `excerpt` | string | 文章摘要，用于列表页展示 | `"一款融合了中国神话与动作元素的佳作"` |
-| `publishedAt` | string | 发布日期，格式 YYYY-MM-DD | `"2024-08-20"` |
-| `author` | string | 作者名称 | `"望月屋"` |
-| `categoryKey` | string | 分类键，见下方分类列表 | `"geek-life"` |
-| `image.src` | string | 封面图路径 | `"/images/posts/wukong.jpg"` |
-| `image.alt` | string | 封面图替代文本 | `"黑神话：悟空游戏截图"` |
-| `coverRatio` | string | 封面图比例，见下方比例列表 | `"landscape"` |
-| `imageSide` | string | 列表页封面位置 | `"left"` 或 `"right"` |
-| `tags` | array | 标签数组 | `["动作", "RPG", "国产"]` |
+| 字段          | 类型   | 说明                       | 示例                                   |
+| ------------- | ------ | -------------------------- | -------------------------------------- |
+| `title`       | string | 文章标题                   | `"黑神话：悟空评测"`                   |
+| `excerpt`     | string | 文章摘要，用于列表页展示   | `"一款融合了中国神话与动作元素的佳作"` |
+| `publishedAt` | string | 发布日期，格式 YYYY-MM-DD  | `"2024-08-20"`                         |
+| `author`      | string | 作者名称                   | `"明月几时有"`                         |
+| `categoryKey` | string | 分类键，见下方分类列表     | `"geek-life"`                          |
+| `image.src`   | string | 封面图路径                 | `"/images/posts/wukong.jpg"`           |
+| `image.alt`   | string | 封面图替代文本             | `"黑神话：悟空游戏截图"`               |
+| `coverRatio`  | string | 封面图比例，见下方比例列表 | `"landscape"`                          |
+| `imageSide`   | string | 列表页封面位置             | `"left"` 或 `"right"`                  |
+| `tags`        | array  | 标签数组                   | `["动作", "RPG", "国产"]`              |
 
 ### 可选字段
 
-| 字段 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| `slug` | string | 文件名 | URL 路径标识，需与文件名一致 |
-| `updatedAt` | string | null | 最后更新日期 |
-| `series` | string | null | 系列文章名称 |
-| `featured` | boolean | false | 是否精选，影响首页排序 |
-| `draft` | boolean | false | 是否为草稿，生产环境不显示 |
-| `previewSections` | array | [] | 详情页预览段落 |
-| `relatedGames` | array | undefined | 关联的 Steam 游戏（见下方） |
+| 字段              | 类型    | 默认值    | 说明                         |
+| ----------------- | ------- | --------- | ---------------------------- |
+| `slug`            | string  | 文件名    | URL 路径标识，需与文件名一致 |
+| `updatedAt`       | string  | null      | 最后更新日期                 |
+| `series`          | string  | null      | 系列文章名称                 |
+| `featured`        | boolean | false     | 是否精选，影响首页排序       |
+| `draft`           | boolean | false     | 是否为草稿，生产环境不显示   |
+| `previewSections` | array   | []        | 详情页预览段落               |
+| `relatedGames`    | array   | undefined | 关联的 Steam 游戏（见下方）  |
 
 ### 分类键值 (categoryKey)
 
@@ -61,13 +61,13 @@ relatedGames:
     note: "本文评测的游戏"
 ```
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `appId` | number | 是 | Steam 应用 ID（正整数） |
-| `title` | string | 是 | 游戏标题 |
-| `steamUrl` | string | 是 | Steam 商店页链接 |
-| `coverImage` | string | 否 | 游戏封面图路径 |
-| `note` | string | 否 | 备注说明 |
+| 字段         | 类型   | 必填 | 说明                    |
+| ------------ | ------ | ---- | ----------------------- |
+| `appId`      | number | 是   | Steam 应用 ID（正整数） |
+| `title`      | string | 是   | 游戏标题                |
+| `steamUrl`   | string | 是   | Steam 商店页链接        |
+| `coverImage` | string | 否   | 游戏封面图路径          |
+| `note`       | string | 否   | 备注说明                |
 
 ## 文章文件命名规范
 
@@ -109,7 +109,7 @@ relatedGames:
 title: "黑神话：悟空评测"
 excerpt: "一款融合了中国神话与动作元素的佳作，虽有小瑕疵但整体表现出色"
 publishedAt: "2024-08-20"
-author: "望月屋"
+author: "明月几时有"
 categoryKey: "geek-life"
 image:
   src: "/images/posts/wukong.jpg"
@@ -125,7 +125,6 @@ relatedGames:
     coverImage: "/images/games/wukong.jpg"
     note: "本文评测的主游戏"
 ---
-
 文章正文从这里开始...
 ```
 

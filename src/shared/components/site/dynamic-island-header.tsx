@@ -66,10 +66,10 @@ function renderDesktopNavigationItems(
         to={item.to}
         ref={(element) => setItemRef(item.to, element)}
         className={cn(
-          "relative px-1 pb-2 font-heading text-base font-black uppercase tracking-[0.18em] transition-[transform,opacity] duration-300",
+          "relative z-10 inline-flex h-11 min-w-[5.5rem] translate-y-0 items-center justify-center border-4 px-4 py-0 font-heading text-base leading-none font-black uppercase tracking-[0.18em] transition-[translate,color,border-color,background-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform",
           isActive
-            ? "theme-text-strong opacity-100"
-            : "theme-text-soft opacity-100 hover:opacity-100 hover:skew-x-[-8deg]",
+            ? "border-transparent bg-transparent text-[var(--copy-strong)] opacity-100"
+            : "border-transparent bg-transparent text-[var(--copy-soft)] opacity-100 hover:-translate-y-0.5 hover:border-[color-mix(in_srgb,var(--line-strong)_72%,transparent)] hover:bg-[color-mix(in_srgb,var(--surface-panel)_68%,transparent)] hover:text-[var(--copy-strong)]",
         )}
       >
         {item.label}
@@ -210,35 +210,10 @@ export function DynamicIslandHeader({
     {},
   );
   const palettePanelRef = useRef<HTMLDivElement | null>(null);
-  const brandLinkRef = useRef<HTMLAnchorElement | null>(null);
-  const [brandSlotWidth, setBrandSlotWidth] = useState(0);
 
   useEffect(() => {
     isExpandedRef.current = isExpanded;
   }, [isExpanded]);
-
-  useLayoutEffect(() => {
-    const brandElement = brandLinkRef.current;
-
-    if (!brandElement) {
-      return;
-    }
-
-    const measure = () => {
-      setBrandSlotWidth(brandElement.getBoundingClientRect().width);
-    };
-
-    measure();
-
-    const resizeObserver = new ResizeObserver(measure);
-    resizeObserver.observe(brandElement);
-    window.addEventListener("resize", measure);
-
-    return () => {
-      resizeObserver.disconnect();
-      window.removeEventListener("resize", measure);
-    };
-  }, [config.brand.primaryLabel]);
 
   function setNavigationItemRef(
     to: string,
@@ -430,7 +405,8 @@ export function DynamicIslandHeader({
     }
 
     indicatorElement.style.transition =
-      "transform 280ms cubic-bezier(0.22, 1, 0.36, 1), width 280ms cubic-bezier(0.22, 1, 0.36, 1), opacity 180ms ease-out";
+      "transform 420ms cubic-bezier(0.2, 0.9, 0.22, 1), width 420ms cubic-bezier(0.2, 0.9, 0.22, 1), opacity 180ms ease-out";
+    indicatorElement.style.willChange = "transform,width";
   }, []);
 
   useEffect(() => {
@@ -513,7 +489,6 @@ export function DynamicIslandHeader({
           )}
         >
           <Link
-            ref={brandLinkRef}
             to="/"
             className={cn(
               "block whitespace-nowrap font-heading text-base leading-none font-black uppercase tracking-tight",
@@ -551,23 +526,25 @@ export function DynamicIslandHeader({
         >
           <header className="pt-0">
             <div
-              className="flex h-full items-center justify-between gap-4 px-4 py-2 md:px-6"
+              className="relative flex h-full items-center justify-end gap-4 px-4 py-2 md:px-6"
             >
-              <div aria-hidden className="shrink-0" style={{ width: brandSlotWidth }} />
-
               <div
-                ref={navigationRef}
-                className="relative hidden items-center gap-8 md:flex"
+                className="pointer-events-none absolute inset-x-0 top-1/2 hidden -translate-y-1/2 justify-center md:flex"
               >
-                {renderDesktopNavigationItems(
-                  config.navigation,
-                  location.pathname,
-                  setNavigationItemRef,
-                )}
                 <div
-                  ref={navigationIndicatorRef}
-                  className="pointer-events-none absolute bottom-0 left-0 h-1 bg-[var(--surface-ink)] opacity-0"
-                />
+                  ref={navigationRef}
+                  className="pointer-events-auto relative flex items-center gap-4"
+                >
+                  {renderDesktopNavigationItems(
+                    config.navigation,
+                    location.pathname,
+                    setNavigationItemRef,
+                  )}
+                  <div
+                    ref={navigationIndicatorRef}
+                    className="pointer-events-none absolute inset-y-0 left-0 z-0 my-auto h-11 border-4 border-[var(--line-strong)] bg-[var(--surface-panel)] shadow-[4px_4px_0px_0px_var(--surface-ink)] opacity-0"
+                  />
+                </div>
               </div>
 
               <div
@@ -584,11 +561,13 @@ export function DynamicIslandHeader({
                   size="icon"
                   className="size-11"
                   aria-label={
-                    theme === "light" ? "切换到夜间模式" : "切换到日间模式"
+                    resolvedTheme === "light"
+                      ? "切换到夜间模式"
+                      : "切换到日间模式"
                   }
                   onClick={toggleTheme}
                 >
-                  {theme === "light" ? (
+                  {resolvedTheme === "light" ? (
                     <MoonStar className="size-5" />
                   ) : (
                     <SunMedium className="size-5" />

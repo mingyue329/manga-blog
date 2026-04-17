@@ -1,5 +1,6 @@
 import { ExternalLink, Gamepad2 } from "lucide-react";
 import type { SteamProfileSummary } from "../steam-types";
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
 
 interface SteamProfileCardProps {
   profile: SteamProfileSummary;
@@ -15,13 +16,16 @@ export function SteamProfileCardComponent({ profile }: SteamProfileCardProps) {
       {/* 头像和基本信息 */}
       <div className="flex items-start gap-4">
         {/* 头像 */}
-        <div className="relative w-20 h-20 rounded-full overflow-hidden bg-muted flex-shrink-0">
-          <img
+        <Avatar className="relative h-20 w-20 flex-shrink-0 rounded-full border border-border bg-muted">
+          <AvatarImage
             src={profile.avatar.src}
             alt={profile.avatar.alt}
             className="w-full h-full object-cover"
           />
-        </div>
+          <AvatarFallback className="text-lg font-bold">
+            {profile.displayName.slice(0, 1)}
+          </AvatarFallback>
+        </Avatar>
 
         {/* 昵称和链接 */}
         <div className="flex-1 min-w-0">

@@ -85,19 +85,12 @@ function applyTheme(theme: SiteTheme, resolvedTheme: ResolvedSiteTheme): void {
 }
 
 /**
- * 按顺序循环切换主题模式。
- * 头部原有图标按钮会复用这个顺序，在三种模式之间来回切换。
+ * 头部图标按钮使用二态切换。
+ * 即使当前处于 `system`，也会基于当前解析结果在明暗之间直接翻转，
+ * 避免出现点击后视觉上“没有变化”的情况。
  */
-function getNextTheme(theme: SiteTheme): SiteTheme {
-  if (theme === "light") {
-    return "dark";
-  }
-
-  if (theme === "dark") {
-    return "system";
-  }
-
-  return "light";
+function getNextToggleTheme(resolvedTheme: ResolvedSiteTheme): SiteTheme {
+  return resolvedTheme === "light" ? "dark" : "light";
 }
 
 /**
@@ -241,7 +234,7 @@ export function ThemeProvider({
       paperColor,
       inkColor,
       toggleTheme: () => {
-        setTheme((currentTheme) => getNextTheme(currentTheme));
+        setTheme(getNextToggleTheme(resolvedTheme));
       },
       setTheme,
       setHue: (value: number) => {

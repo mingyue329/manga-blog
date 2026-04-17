@@ -2,7 +2,7 @@
 title: "Markdown 功能完整演示"
 excerpt: "全面展示博客系统支持的 Markdown 语法和扩展功能,包括代码高亮、多媒体嵌入等"
 publishedAt: "2026-04-15"
-author: "望月屋"
+author: "明月几时有"
 categoryKey: "tutorial"
 image:
   src: "/images/posts/markdown-demo.jpg"
@@ -72,7 +72,7 @@ featured: true
 
 ```javascript
 // React 组件示例
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 function Counter() {
   const [count, setCount] = useState(0);
@@ -80,9 +80,7 @@ function Counter() {
   return (
     <div className="counter">
       <p>当前计数: {count}</p>
-      <button onClick={() => setCount(count + 1)}>
-        点击增加
-      </button>
+      <button onClick={() => setCount(count + 1)}>点击增加</button>
     </div>
   );
 }
@@ -97,7 +95,7 @@ interface User {
   id: number;
   name: string;
   email: string;
-  role: 'admin' | 'user' | 'guest';
+  role: "admin" | "user" | "guest";
 }
 
 function greetUser(user: User): string {
@@ -106,9 +104,9 @@ function greetUser(user: User): string {
 
 const currentUser: User = {
   id: 1,
-  name: '望月屋',
-  email: 'example@test.com',
-  role: 'admin',
+  name: "明月几时有",
+  email: "example@test.com",
+  role: "admin",
 };
 
 console.log(greetUser(currentUser));
@@ -181,21 +179,21 @@ LIMIT 10;
 
 ### 游戏评测评分表
 
-| 游戏名称 | 画面 | 玩法 | 剧情 | 综合评分 |
-|---------|------|------|------|----------|
-| 黑神话:悟空 | 9.5 | 9.0 | 8.5 | 9.0 |
-| ELDEN RING | 9.0 | 9.5 | 9.0 | 9.2 |
-| 对马岛之魂 | 9.5 | 8.5 | 9.0 | 9.0 |
-| Cyberpunk 2077 | 8.5 | 8.0 | 8.5 | 8.3 |
+| 游戏名称       | 画面 | 玩法 | 剧情 | 综合评分 |
+| -------------- | ---- | ---- | ---- | -------- |
+| 黑神话:悟空    | 9.5  | 9.0  | 8.5  | 9.0      |
+| ELDEN RING     | 9.0  | 9.5  | 9.0  | 9.2      |
+| 对马岛之魂     | 9.5  | 8.5  | 9.0  | 9.0      |
+| Cyberpunk 2077 | 8.5  | 8.0  | 8.5  | 8.3      |
 
 ### 技术栈对比
 
-| 特性 | React | Vue | Svelte |
-|------|-------|-----|--------|
-| 学习曲线 | 中等 | 简单 | 简单 |
-| 性能 | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
-| 生态系统 | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ |
-| 类型支持 | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
+| 特性     | React      | Vue      | Svelte     |
+| -------- | ---------- | -------- | ---------- |
+| 学习曲线 | 中等       | 简单     | 简单       |
+| 性能     | ⭐⭐⭐⭐   | ⭐⭐⭐   | ⭐⭐⭐⭐⭐ |
+| 生态系统 | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐     |
+| 类型支持 | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐   |
 
 ---
 
@@ -279,7 +277,7 @@ $$e^{i\pi} + 1 = 0$$
 > [!WARNING] 警告
 > 需要注意的事项,可能会导致问题。
 
-> [!CAUTION]  caution
+> [!CAUTION] caution
 > 危险操作,执行前请三思。
 
 ---
@@ -289,6 +287,7 @@ $$e^{i\pi} + 1 = 0$$
 这是一个带有脚注的文本[^1],这是另一个脚注[^2]。
 
 [^1]: 这是第一个脚注的内容。
+
 [^2]: 这是第二个脚注,可以包含**格式化**文本。
 
 ---
@@ -365,6 +364,6 @@ $$e^{i\pi} + 1 = 0$$
 ✅ 提示框 (Admonitions)  
 ✅ 脚注  
 ✅ 原生 HTML  
-✅ Emoji 表情  
+✅ Emoji 表情
 
 **现在你可以开始创作精彩的内容了!** 🚀

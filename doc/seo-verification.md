@@ -34,7 +34,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>KawaiiTech | 星码绽放</title>
+    <title>明月几时有</title>
     <link>https://example.com/</link>
     <description>黑白漫画科技风的个人博客...</description>
     <language>zh</language>
@@ -127,11 +127,13 @@ Sitemap: https://example.com/sitemap.xml
 ### 验证项
 
 #### 基础 Meta
+
 - ✅ `<title>` - 页面标题
 - `<meta name="description">` - 页面描述
 - ✅ `<link rel="canonical">` - 规范 URL
 
 #### Open Graph
+
 - ✅ `<meta property="og:title">` - OG 标题
 - ✅ `<meta property="og:description">` - OG 描述
 - ✅ `<meta property="og:url">` - OG URL
@@ -146,12 +148,14 @@ Sitemap: https://example.com/sitemap.xml
 - ✅ `<meta property="article:tag">` - 文章标签 (文章页,可多个)
 
 #### Twitter Card
+
 - ✅ `<meta name="twitter:card">` - 卡片类型 (summary_large_image)
 - ✅ `<meta name="twitter:title">` - Twitter 标题
 - ✅ `<meta name="twitter:description">` - Twitter 描述
 - ✅ `<meta name="twitter:image">` - Twitter 图片 (可选)
 
 ### 文章页特殊处理
+
 - ✅ 标题格式: `{文章标题} | {站点名称}`
 - ✅ 使用文章 excerpt 作为描述
 - ✅ 使用文章封面图作为 OG 图片
@@ -163,6 +167,7 @@ Sitemap: https://example.com/sitemap.xml
 ## 📋 验证清单
 
 ### 开发环境验证
+
 ```bash
 # 启动开发服务器
 pnpm dev
@@ -174,6 +179,7 @@ pnpm dev
 ```
 
 ### 生产构建验证
+
 ```bash
 # 构建项目
 pnpm build
@@ -188,6 +194,7 @@ pnpm preview
 ```
 
 ### 在线工具验证
+
 1. **RSS 验证**: https://validator.w3.org/feed/
 2. **Sitemap 验证**: https://www.xml-sitemaps.com/validate-xml-sitemap.html
 3. **Open Graph 验证**: https://developers.facebook.com/tools/debug/
@@ -204,9 +211,9 @@ pnpm preview
 
 ```typescript
 export const siteMetadata = {
-  siteUrl: 'https://your-domain.com', // 改为你的域名
+  siteUrl: "https://your-domain.com", // 改为你的域名
   // ...
-}
+};
 ```
 
 或在部署时设置环境变量:

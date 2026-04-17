@@ -20,7 +20,7 @@ import { resolveRouteScene } from "@/shared/site/route-scene-config";
 import { siteConfig } from "@/shared/site/site-config";
 
 const COLLAPSED_BANNER_HEIGHT = "min(58.8vh, 728px)";
-const BANNER_IMAGE_SAFE_BLEED_RATIO = 0.12;
+const BANNER_IMAGE_SAFE_BLEED_RATIO = 0.18;
 
 function shouldPinBanner(pathname: string): boolean {
   return pathname === "/";

@@ -317,7 +317,7 @@ export function PostDetailPage(): ReactElement {
 
     // 清理函数：组件卸载时恢复默认标题
     return () => {
-      document.title = "KawaiiTech | 星码绽放";
+      document.title = "明月几时有";
     };
   }, [pageData.post]);
 

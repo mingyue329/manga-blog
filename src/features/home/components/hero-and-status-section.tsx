@@ -1,6 +1,7 @@
 import type { ReactElement } from "react";
 import { Link } from "react-router-dom";
 
+import { SiteLanyard } from "@/shared/components/site/site-lanyard";
 import { useGsapHoverLift } from "@/shared/lib/use-gsap-hover-preview-card";
 import { getSiteIcon } from "@/shared/lib/site-icons";
 import { Button } from "@/shared/ui/button";
@@ -141,9 +142,6 @@ function HeroMediaCluster({ hero }: { hero: HeroSectionData }): ReactElement {
         className="theme-surface-panel theme-border-strong relative aspect-square w-full overflow-hidden border-4"
       >
         {renderHeroAvatarMedia(hero)}
-        <div className="theme-surface-panel theme-border-strong absolute left-3 top-3 z-30 border-2 px-3 py-1 font-heading text-xs font-black uppercase tracking-[0.18em]">
-          {hero.greeting}
-        </div>
       </div>
     </div>
   );
@@ -154,10 +152,15 @@ export function HeroAndStatusSection({
   statusPanel,
 }: HeroAndStatusSectionProps): ReactElement {
   const MapPinIcon = getSiteIcon("map-pin");
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
   return (
     <section className="grid items-stretch gap-8 lg:grid-cols-[minmax(0,1.65fr)_minmax(320px,0.9fr)]">
       <Card className="theme-surface-panel theme-border-strong relative overflow-visible border-4 py-0 manga-panel">
+        <SiteLanyard
+          className="pointer-events-auto absolute -right-10 -top-7 z-30 h-72 w-56 md:left-[56%] md:right-[-18rem] md:top-[-1.5rem] md:bottom-[-1.5rem] md:h-auto md:w-auto md:translate-x-[40%] lg:left-[58%] lg:right-[-22rem] lg:top-[-2rem] lg:bottom-[-1.75rem] lg:translate-x-[40%]"
+          isMobile={isMobile}
+        />
         <div className="manga-speed-lines absolute inset-0 opacity-70" />
         <CardContent className="relative z-10 flex flex-col gap-10 p-6 md:p-8 lg:flex-row lg:items-center">
           <HeroMediaCluster hero={hero} />

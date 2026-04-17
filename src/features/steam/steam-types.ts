@@ -29,6 +29,11 @@ export interface SteamProfileSummary {
   featuredGames: SteamGameCard[];
 }
 
+export interface SteamApiConfig {
+  apiKey: string;
+  steamId: string;
+}
+
 /**
  * Steam 数据源接口。
  * 为未来切换为 API 数据源预留抽象层,当前先实现本地静态数据源。

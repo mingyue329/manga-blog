@@ -9,11 +9,13 @@
 ### 1. 两种状态
 
 **展开状态 (Expanded)**
+
 - 显示完整的导航栏
 - 包含品牌、导航菜单、快捷操作
 - 背景半透明毛玻璃效果
 
 **收起状态 (Collapsed)**
+
 - 胶囊形状,宽度280px
 - 只显示品牌名称
 - 圆角全包围,悬浮阴影
@@ -21,15 +23,18 @@
 ### 2. 智能交互
 
 #### 自动收起
+
 - 页面加载后5秒无操作自动收起
 - 减少视觉干扰,突出内容
 
 #### 滚动展开
+
 - 检测到滚动立即展开
 - 滚动停止1秒后重新启动定时器
 - 确保用户随时可以访问导航
 
 #### 悬停展开
+
 - 鼠标进入Header区域立即展开
 - 鼠标离开后5秒自动收起
 - 提供即时的交互反馈
@@ -37,11 +42,13 @@
 ### 3. 流畅动画
 
 **动画曲线**: `cubic-bezier(0.34, 1.56, 0.64, 1)`
+
 - 弹簧物理效果,类似iOS原生体验
 - 展开时轻微 overshoot(过冲)
 - 持续时间500ms
 
 **过渡属性**:
+
 - 宽度: 全宽 ↔ 280px
 - 透明度: 1 ↔ 0
 - 缩放: 1 ↔ 0.95
@@ -79,25 +86,28 @@ useEffect(() => {
       clearAutoCollapseTimer();
     }
   };
-  window.addEventListener('scroll', handleScroll);
+  window.addEventListener("scroll", handleScroll);
 }, []);
 ```
 
 ### CSS 类名
 
 **容器定位**:
+
 ```css
 fixed top-0 left-0 right-0 z-50
 ```
 
 **展开状态**:
+
 ```css
 w-full bg-background/80 backdrop-blur-md border-b-2
 ```
 
 **收起状态**:
+
 ```css
-w-[280px] mt-3 rounded-full bg-background/95 
+w-[280px] mt-3 rounded-full bg-background/95
 backdrop-blur-xl border-2 shadow-lg
 ```
 
@@ -108,13 +118,13 @@ backdrop-blur-xl border-2 shadow-lg
 ```
 [━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━]  完整导航栏
          ↓ 5秒无操作
-        [望月屋]                    胶囊形状
+        [明月几时有]                    胶囊形状
 ```
 
 ### 收起 → 展开动画
 
 ```
-        [望月屋]                    检测到滚动
+        [明月几时有]                    检测到滚动
          ↓ 立即响应
 [━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━]  完整导航栏
 ```
@@ -136,14 +146,14 @@ window.setTimeout(() => {
 
 ```typescript
 // 默认280px
-'w-[280px]' // 改为 'w-[320px]' 更宽
+"w-[280px]"; // 改为 'w-[320px]' 更宽
 ```
 
 ### 修改动画速度
 
 ```typescript
 // 默认500ms
-'duration-500' // 改为 'duration-300' 更快
+"duration-500"; // 改为 'duration-300' 更快
 ```
 
 ### 禁用自动收起
@@ -171,17 +181,21 @@ window.setTimeout(() => {
 ## 🐛 常见问题
 
 ### Q: Header不跟随滚动?
+
 A: 检查 `site-header.tsx` 是否移除了 `fixed` 定位
 
 ### Q: 动画卡顿?
+
 A: 确保浏览器支持 `backdrop-filter`,旧浏览器会降级
 
 ### Q: 移动端体验不佳?
+
 A: 可以针对移动端禁用灵动岛,保持固定Header
 
 ## 📊 用户体验数据
 
 **预期效果**:
+
 - 减少Header占用空间 ~70%
 - 提升内容可视区域
 - 保持导航可访问性 100%

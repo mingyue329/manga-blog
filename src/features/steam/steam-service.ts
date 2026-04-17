@@ -1,14 +1,33 @@
 import type { SteamProfileSummary, SteamSource } from "./steam-types";
 import { getSteamProfile as getLocalSteamProfile } from "./steam-content";
+import { resolvePublicAssetPath } from "@/shared/site/site-metadata";
+
+const steamProfileApiPath = resolvePublicAssetPath(
+  import.meta.env.BASE_URL,
+  "api/steam/profile-summary",
+);
 
 /**
  * 本地 Steam 数据源实现。
- * 从静态内容文件读取数据,适用于不需要动态同步的场景。
+ * 优先读取本地开发态 API，失败时回退到静态内容文件。
  */
 class LocalSteamSource implements SteamSource {
   async getProfileSummary(): Promise<SteamProfileSummary> {
-    // 当前直接返回静态数据,未来可在此处添加缓存逻辑或切换为 API 调用
-    return getLocalSteamProfile();
+    try {
+      const response = await fetch(steamProfileApiPath, {
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Steam profile request failed: ${response.status}`);
+      }
+
+      return (await response.json()) as SteamProfileSummary;
+    } catch {
+      return getLocalSteamProfile();
+    }
   }
 }
 

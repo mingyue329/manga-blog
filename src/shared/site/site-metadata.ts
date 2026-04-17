@@ -6,7 +6,7 @@
  * 避免 `index.html`、运行时脚本和页面配置各自维护一套标题与静态资源路径。
  */
 export const siteMetadata = {
-  title: "KawaiiTech | 星码绽放",
+  title: "明月几时有",
   description: "黑白漫画科技风的个人博客，记录游戏、技术与创作过程。",
   siteUrl: "https://example.com",
   language: "zh",
