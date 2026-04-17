@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { useGsapHoverPreviewCard } from "@/shared/lib/use-gsap-hover-preview-card";
+import { getPublicAssetUrl } from "@/shared/lib/public-asset";
 import { Badge } from "@/shared/ui/badge";
 import {
   Card,
@@ -46,12 +47,12 @@ function UpdateCard({ item }: { item: UpdateArticle }): ReactElement {
               className="pointer-events-none absolute inset-0 bg-[var(--preview-image-overlay)]"
             />
             <img
-              ref={imageRef}
-              src={item.image.src}
-              alt={item.image.alt}
-              className="h-full w-full object-cover"
-              loading="lazy"
-            />
+                ref={imageRef}
+                src={getPublicAssetUrl(item.image.src)}
+                alt={item.image.alt}
+                className="h-full w-full object-cover"
+                loading="lazy"
+              />
           </div>
           <CardContent className="space-y-4 p-6">
             <div className="flex flex-wrap items-center gap-3">

@@ -26,7 +26,26 @@ export function resolvePublicAssetPath(
   baseUrl: string,
   assetPath: string,
 ): string {
+  if (!assetPath) return assetPath;
+  if (
+    assetPath.startsWith("http://") ||
+    assetPath.startsWith("https://") ||
+    assetPath.startsWith("data:")
+  ) {
+    return assetPath;
+  }
+
   const normalizedBaseUrl = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
+
+  // 防止重复拼接：如果路径已经包含了 base 前缀，就不再拼接
+  if (assetPath.startsWith(normalizedBaseUrl)) {
+    return assetPath;
+  }
+  // 如果路径以带斜杠的 base 开头（例如 base='/manga-blog/', path='/manga-blog/abc'）
+  if (assetPath.startsWith(normalizedBaseUrl.slice(0, -1) + "/")) {
+    return assetPath;
+  }
+
   const normalizedAssetPath = assetPath.replace(/^\/+/, "");
 
   return `${normalizedBaseUrl}${normalizedAssetPath}`;

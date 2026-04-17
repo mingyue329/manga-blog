@@ -1,5 +1,6 @@
-import type { ReactElement } from "react";
+import { Fragment, type ReactElement } from "react";
 
+import { getPublicAssetUrl } from "@/shared/lib/public-asset";
 import {
   useGsapHoverLift,
   useGsapHoverPreviewCard,
@@ -51,7 +52,7 @@ function ImagePanel({ panel }: { panel: AboutShowcasePanel }): ReactElement {
           />
           <img
             ref={imageRef}
-            src={panel.image?.src}
+            src={panel.image?.src ? getPublicAssetUrl(panel.image.src) : undefined}
             alt={panel.image?.alt ?? ""}
             className="h-full w-full object-cover"
             loading="lazy"
