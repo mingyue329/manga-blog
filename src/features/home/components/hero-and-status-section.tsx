@@ -142,6 +142,9 @@ function HeroMediaCluster({ hero }: { hero: HeroSectionData }): ReactElement {
         className="theme-surface-panel theme-border-strong relative aspect-square w-full overflow-hidden border-4"
       >
         {renderHeroAvatarMedia(hero)}
+        <div className="theme-surface-panel theme-border-strong absolute left-3 top-3 z-30 border-2 px-3 py-1 font-heading text-xs font-black uppercase tracking-[0.18em]">
+          {hero.greeting}
+        </div>
       </div>
     </div>
   );

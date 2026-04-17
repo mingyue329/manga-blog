@@ -561,13 +561,11 @@ export function DynamicIslandHeader({
                   size="icon"
                   className="size-11"
                   aria-label={
-                    resolvedTheme === "light"
-                      ? "切换到夜间模式"
-                      : "切换到日间模式"
+                    theme === "light" ? "切换到夜间模式" : "切换到日间模式"
                   }
                   onClick={toggleTheme}
                 >
-                  {resolvedTheme === "light" ? (
+                  {theme === "light" ? (
                     <MoonStar className="size-5" />
                   ) : (
                     <SunMedium className="size-5" />
