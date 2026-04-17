@@ -1,4 +1,4 @@
-import { Fragment, type ReactElement } from "react";
+import type { ReactElement } from "react";
 
 import { getPublicAssetUrl } from "@/shared/lib/public-asset";
 import {
