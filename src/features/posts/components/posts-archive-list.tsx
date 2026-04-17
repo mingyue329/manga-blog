@@ -2,6 +2,7 @@ import type { ReactElement } from "react";
 import { ArrowRight, Sparkles, Stars } from "lucide-react";
 import { Link } from "react-router-dom";
 
+import { getPublicAssetUrl } from "@/shared/lib/public-asset";
 import { getPostCoverRatioClass } from "@/shared/lib/post-cover-ratio";
 import { useGsapHoverPreviewCard } from "@/shared/lib/use-gsap-hover-preview-card";
 import { cn } from "@/shared/lib/utils";
@@ -101,7 +102,7 @@ function ArchivePostCard({
             />
             <img
               ref={imageRef}
-              src={post.image.src}
+              src={getPublicAssetUrl(post.image.src)}
               alt={post.image.alt}
               className="h-full w-full object-cover"
               loading="lazy"

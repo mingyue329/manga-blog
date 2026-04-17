@@ -5,6 +5,8 @@ import rehypeRaw from "rehype-raw";
 import rehypeHighlight from "rehype-highlight";
 import "highlight.js/styles/atom-one-dark.css";
 
+import { getPublicAssetUrl } from "@/shared/lib/public-asset";
+
 interface PostMarkdownProps {
   markdownContent: string;
 }
@@ -55,10 +57,19 @@ export function PostMarkdown({
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw, rehypeHighlight]}
         components={{
+          // 自定义图片渲染
+          img: ({ src, alt, ...props }) => (
+            <img
+              src={src ? getPublicAssetUrl(src) : undefined}
+              alt={alt}
+              loading="lazy"
+              {...props}
+            />
+          ),
           // 自定义视频渲染
           video: ({ src, ...props }) => (
             <video
-              src={src}
+              src={src ? getPublicAssetUrl(src) : undefined}
               controls
               className="my-8 w-full rounded-lg border-4 border-[var(--line-strong)]"
               {...props}
@@ -66,7 +77,12 @@ export function PostMarkdown({
           ),
           // 自定义音频渲染
           audio: ({ src, ...props }) => (
-            <audio src={src} controls className="my-8 w-full" {...props} />
+            <audio 
+              src={src ? getPublicAssetUrl(src) : undefined} 
+              controls 
+              className="my-8 w-full" 
+              {...props} 
+            />
           ),
         }}
       >

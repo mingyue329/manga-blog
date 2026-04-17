@@ -2,6 +2,7 @@ import { useEffect, useRef, type ReactElement } from 'react'
 import { gsap } from 'gsap'
 import { Link } from 'react-router-dom'
 
+import { getPublicAssetUrl } from "@/shared/lib/public-asset"
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
 import {
@@ -109,7 +110,7 @@ export function PostPreviewSheet({
         </SheetHeader>
         <div className="space-y-8 p-6">
           <img
-            src={post.image.src}
+            src={getPublicAssetUrl(post.image.src)}
             alt={post.image.alt}
             className="h-64 w-full border-4 border-black object-cover"
           />

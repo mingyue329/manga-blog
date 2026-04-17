@@ -14,6 +14,7 @@ import { Link, useLoaderData } from "react-router-dom";
 
 import { PostMarkdown } from "@/features/posts/components/post-markdown";
 import { getPostCoverRatioClass } from "@/shared/lib/post-cover-ratio";
+import { getPublicAssetUrl } from "@/shared/lib/public-asset";
 import { useGsapHoverPreviewCard } from "@/shared/lib/use-gsap-hover-preview-card";
 import { cn } from "@/shared/lib/utils";
 import {
@@ -243,7 +244,7 @@ function RelatedPostCard({
               />
               <img
                 ref={imageRef}
-                src={relatedPost.image.src}
+                src={getPublicAssetUrl(relatedPost.image.src)}
                 alt={relatedPost.image.alt}
                 className="h-full w-full object-cover"
                 loading="lazy"
@@ -382,7 +383,7 @@ export function PostDetailPage(): ReactElement {
               )}
             >
               <img
-                src={pageData.post.image.src}
+                src={getPublicAssetUrl(pageData.post.image.src)}
                 alt={pageData.post.image.alt}
                 className="h-full w-full object-cover"
               />

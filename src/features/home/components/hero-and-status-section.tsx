@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { SiteLanyard } from "@/shared/components/site/site-lanyard";
 import { useGsapHoverLift } from "@/shared/lib/use-gsap-hover-preview-card";
 import { getSiteIcon } from "@/shared/lib/site-icons";
+import { getPublicAssetUrl } from "@/shared/lib/public-asset";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import type {
@@ -27,7 +28,7 @@ function renderHeroAvatarMedia(hero: HeroSectionData): ReactElement {
   if (isVideoAvatarSource(hero.avatar.src)) {
     return (
       <video
-        src={hero.avatar.src}
+        src={getPublicAssetUrl(hero.avatar.src)}
         aria-label={hero.avatar.alt}
         className="size-full object-cover"
         autoPlay
@@ -41,7 +42,7 @@ function renderHeroAvatarMedia(hero: HeroSectionData): ReactElement {
 
   return (
     <img
-      src={hero.avatar.src}
+      src={getPublicAssetUrl(hero.avatar.src)}
       alt={hero.avatar.alt}
       className="size-full object-cover"
       loading="eager"

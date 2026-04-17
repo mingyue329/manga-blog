@@ -1,3 +1,4 @@
+import { getPublicAssetUrl } from "@/shared/lib/public-asset";
 import type { ImageAsset } from "@/shared/types/content";
 
 interface RouteSceneConfig {
@@ -16,8 +17,8 @@ interface ResolvedRouteScene {
 }
 
 const sharedRouteSceneImage = {
-  src: "/images/site/bac.png",
-  alt: "黑白风格的人物侧脸横幅",
+  src: getPublicAssetUrl("/mp4/常态背景.mp4"),
+  alt: "站点默认背景视频",
 } as const satisfies ImageAsset;
 
 const routeScenes = {

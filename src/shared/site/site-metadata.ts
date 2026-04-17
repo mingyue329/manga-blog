@@ -11,7 +11,7 @@ export const siteMetadata = {
   siteUrl: "https://mingyue329.github.io/manga-blog",
   language: "zh",
   faviconPath: "favicon.ico",
-  defaultOgImage: "/images/og-default.jpg", // 默认 Open Graph 图片
+  defaultOgImage: "images/og-default.jpg", // 默认 Open Graph 图片，需通过工具函数处理
 } as const;
 
 /**
